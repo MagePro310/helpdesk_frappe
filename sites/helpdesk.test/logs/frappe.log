@@ -1,0 +1,114 @@
+2025-09-18 16:41:16,866 ERROR frappe Failed to capture exception
+Site: helpdesk.test
+Form Dict: {'cmd': 'helpdesk.api.dashboard.get_dashboard_notifications'}
+Traceback (most recent call last):
+  File "/home/trieu/D/app/frappe-bench/env/lib/python3.12/site-packages/werkzeug/wrappers/request.py", line 611, in get_json
+    rv = self.json_module.loads(data)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/trieu/anaconda3/lib/python3.12/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/trieu/anaconda3/lib/python3.12/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/trieu/anaconda3/lib/python3.12/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/trieu/D/app/frappe-bench/apps/frappe/frappe/utils/sentry.py", line 122, in capture_exception
+    scope.set_context("JSON Body", frappe.request.json)
+                                   ^^^^^^^^^^^^^^^^^^^
+  File "/home/trieu/D/app/frappe-bench/apps/frappe/frappe/utils/local.py", line 66, in __getattr__
+    return getattr(self._get_current_object(), name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/trieu/D/app/frappe-bench/env/lib/python3.12/site-packages/werkzeug/wrappers/request.py", line 560, in json
+    return self.get_json()
+           ^^^^^^^^^^^^^^^
+  File "/home/trieu/D/app/frappe-bench/env/lib/python3.12/site-packages/werkzeug/wrappers/request.py", line 620, in get_json
+    rv = self.on_json_loading_failed(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/trieu/D/app/frappe-bench/env/lib/python3.12/site-packages/werkzeug/wrappers/request.py", line 645, in on_json_loading_failed
+    raise BadRequest(f"Failed to decode JSON object: {e}")
+werkzeug.exceptions.BadRequest: 400 Bad Request: Failed to decode JSON object: Expecting value: line 1 column 1 (char 0)
+2025-09-18 16:41:16,881 ERROR frappe New Exception collected in error log
+Site: helpdesk.test
+Form Dict: {'cmd': 'helpdesk.api.dashboard.get_dashboard_notifications'}
+2025-09-18 16:41:16,977 ERROR frappe Failed to capture exception
+Site: helpdesk.test
+Form Dict: {'cmd': 'helpdesk.api.dashboard.get_dashboard_notifications'}
+Traceback (most recent call last):
+  File "/home/trieu/D/app/frappe-bench/env/lib/python3.12/site-packages/werkzeug/wrappers/request.py", line 611, in get_json
+    rv = self.json_module.loads(data)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/trieu/anaconda3/lib/python3.12/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/trieu/anaconda3/lib/python3.12/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/trieu/anaconda3/lib/python3.12/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/trieu/D/app/frappe-bench/apps/frappe/frappe/utils/sentry.py", line 122, in capture_exception
+    scope.set_context("JSON Body", frappe.request.json)
+                                   ^^^^^^^^^^^^^^^^^^^
+  File "/home/trieu/D/app/frappe-bench/apps/frappe/frappe/utils/local.py", line 66, in __getattr__
+    return getattr(self._get_current_object(), name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/trieu/D/app/frappe-bench/env/lib/python3.12/site-packages/werkzeug/wrappers/request.py", line 560, in json
+    return self.get_json()
+           ^^^^^^^^^^^^^^^
+  File "/home/trieu/D/app/frappe-bench/env/lib/python3.12/site-packages/werkzeug/wrappers/request.py", line 620, in get_json
+    rv = self.on_json_loading_failed(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/trieu/D/app/frappe-bench/env/lib/python3.12/site-packages/werkzeug/wrappers/request.py", line 645, in on_json_loading_failed
+    raise BadRequest(f"Failed to decode JSON object: {e}")
+werkzeug.exceptions.BadRequest: 400 Bad Request: Failed to decode JSON object: Expecting value: line 1 column 1 (char 0)
+2025-09-18 16:41:16,978 ERROR frappe New Exception collected in error log
+Site: helpdesk.test
+Form Dict: {'cmd': 'helpdesk.api.dashboard.get_dashboard_notifications'}
+2025-09-18 16:41:46,994 ERROR frappe Failed to capture exception
+Site: helpdesk.test
+Form Dict: {'cmd': 'helpdesk.api.dashboard.get_dashboard_notifications'}
+Traceback (most recent call last):
+  File "/home/trieu/D/app/frappe-bench/env/lib/python3.12/site-packages/werkzeug/wrappers/request.py", line 611, in get_json
+    rv = self.json_module.loads(data)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/trieu/anaconda3/lib/python3.12/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/trieu/anaconda3/lib/python3.12/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/trieu/anaconda3/lib/python3.12/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/trieu/D/app/frappe-bench/apps/frappe/frappe/utils/sentry.py", line 122, in capture_exception
+    scope.set_context("JSON Body", frappe.request.json)
+                                   ^^^^^^^^^^^^^^^^^^^
+  File "/home/trieu/D/app/frappe-bench/apps/frappe/frappe/utils/local.py", line 66, in __getattr__
+    return getattr(self._get_current_object(), name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/trieu/D/app/frappe-bench/env/lib/python3.12/site-packages/werkzeug/wrappers/request.py", line 560, in json
+    return self.get_json()
+           ^^^^^^^^^^^^^^^
+  File "/home/trieu/D/app/frappe-bench/env/lib/python3.12/site-packages/werkzeug/wrappers/request.py", line 620, in get_json
+    rv = self.on_json_loading_failed(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/trieu/D/app/frappe-bench/env/lib/python3.12/site-packages/werkzeug/wrappers/request.py", line 645, in on_json_loading_failed
+    raise BadRequest(f"Failed to decode JSON object: {e}")
+werkzeug.exceptions.BadRequest: 400 Bad Request: Failed to decode JSON object: Expecting value: line 1 column 1 (char 0)
+2025-09-18 16:41:46,995 ERROR frappe New Exception collected in error log
+Site: helpdesk.test
+Form Dict: {'cmd': 'helpdesk.api.dashboard.get_dashboard_notifications'}

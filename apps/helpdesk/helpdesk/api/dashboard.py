@@ -713,3 +713,427 @@ def get_avg_tickets_per_day(from_date, to_date, conds=""):
     avg_tickets_per_day = total_tickets / days
 
     return avg_tickets_per_day
+
+
+@frappe.whitelist()
+@agent_only
+def get_quick_action_counts():
+    """
+    Get counts for quick action filters in dashboard
+    """
+    user = frappe.session.user
+    is_manager = "Agent Manager" in frappe.get_roles(user)
+    
+    # My tickets count
+    my_tickets = frappe.db.count(
+        "HD Ticket",
+        filters={
+            "_assign": ["like", f"%{user}%"],
+            "status": ["in", frappe.get_all("HD Ticket Status", filters={"category": "Open"}, pluck="name")]
+        }
+    )
+    
+    # Team tickets count (if manager)
+    team_tickets = 0
+    if is_manager:
+        team_tickets = frappe.db.count(
+            "HD Ticket",
+            filters={
+                "agent_group": ["in", frappe.get_all("HD Team Member", filters={"user": user}, pluck="parent")],
+                "status": ["in", frappe.get_all("HD Ticket Status", filters={"category": "Open"}, pluck="name")]
+            }
+        )
+    
+    # High priority tickets
+    high_priority = frappe.db.count(
+        "HD Ticket",
+        filters={
+            "priority": "High",
+            "status": ["in", frappe.get_all("HD Ticket Status", filters={"category": "Open"}, pluck="name")]
+        }
+    )
+    
+    # Overdue tickets
+    overdue = frappe.db.sql("""
+        SELECT COUNT(name) as count
+        FROM `tabHD Ticket`
+        WHERE status IN (
+            SELECT name FROM `tabHD Ticket Status` WHERE category = 'Open'
+        )
+        AND (
+            (response_by < NOW() AND first_responded_on IS NULL)
+            OR (resolution_by < NOW())
+        )
+    """, as_dict=True)[0].count
+    
+    # Unassigned tickets
+    unassigned = frappe.db.count(
+        "HD Ticket",
+        filters={
+            "_assign": ["is", "not set"],
+            "status": ["in", frappe.get_all("HD Ticket Status", filters={"category": "Open"}, pluck="name")]
+        }
+    )
+    
+    # Pending feedback
+    pending_feedback = frappe.db.count(
+        "HD Ticket",
+        filters={
+            "status": "Waiting for Customer"
+        }
+    )
+    
+    return {
+        "my_tickets": my_tickets,
+        "team_tickets": team_tickets,
+        "high_priority": high_priority,
+        "overdue": overdue,
+        "unassigned": unassigned,
+        "pending_feedback": pending_feedback
+    }
+
+
+@frappe.whitelist()
+@agent_only
+def get_performance_overview(filters=None):
+    """
+    Get performance overview metrics
+    """
+    from_date = filters.get("from_date") if filters else frappe.utils.add_days(frappe.utils.nowdate(), -30)
+    to_date = filters.get("to_date") if filters else frappe.utils.nowdate()
+    
+    # Calculate previous period for comparison
+    period_diff = frappe.utils.date_diff(to_date, from_date)
+    prev_from_date = frappe.utils.add_days(from_date, -period_diff)
+    prev_to_date = from_date
+    
+    # Current period metrics
+    current_response_time = get_avg_first_response_time(from_date, to_date)
+    current_resolution_rate = get_resolution_rate(from_date, to_date)
+    current_csat = get_avg_feedback_score(from_date, to_date)
+    
+    # Previous period metrics
+    prev_response_time = get_avg_first_response_time(prev_from_date, prev_to_date)
+    prev_resolution_rate = get_resolution_rate(prev_from_date, prev_to_date)
+    prev_csat = get_avg_feedback_score(prev_from_date, prev_to_date)
+    
+    # Calculate trends
+    response_time_trend = calculate_trend(current_response_time.get("value", 0), prev_response_time.get("value", 0))
+    resolution_rate_trend = calculate_trend(current_resolution_rate, prev_resolution_rate)
+    csat_trend = calculate_trend(current_csat.get("value", 0), prev_csat.get("value", 0))
+    
+    return {
+        "avg_response_time": round(current_response_time.get("value", 0), 1),
+        "resolution_rate": round(current_resolution_rate, 1),
+        "csat_score": round(current_csat.get("value", 0), 1),
+        "response_time_trend": response_time_trend,
+        "resolution_rate_trend": resolution_rate_trend,
+        "csat_trend": csat_trend
+    }
+
+
+def get_resolution_rate(from_date, to_date):
+    """Get resolution rate percentage"""
+    total_tickets = frappe.db.count("HD Ticket", filters={
+        "creation": ["between", [from_date, to_date]]
+    })
+    
+    resolved_tickets = frappe.db.count("HD Ticket", filters={
+        "creation": ["between", [from_date, to_date]],
+        "status": ["in", frappe.get_all("HD Ticket Status", filters={"category": "Resolved"}, pluck="name")]
+    })
+    
+    return (resolved_tickets / total_tickets * 100) if total_tickets > 0 else 0
+
+
+def calculate_trend(current, previous):
+    """Calculate percentage change between current and previous values"""
+    if previous == 0:
+        return 0
+    return ((current - previous) / previous) * 100
+
+
+@frappe.whitelist()
+@agent_only
+def get_agent_performance_chart(filters=None):
+    """
+    Get agent performance chart data
+    """
+    from_date = filters.get("from_date") if filters else frappe.utils.add_days(frappe.utils.nowdate(), -30)
+    to_date = filters.get("to_date") if filters else frappe.utils.nowdate()
+    
+    result = frappe.db.sql("""
+        SELECT 
+            JSON_UNQUOTE(JSON_EXTRACT(_assign, '$[0]')) as agent,
+            COUNT(name) as tickets_handled,
+            AVG(CASE WHEN first_response_time IS NOT NULL THEN first_response_time / 3600 END) as avg_response_time,
+            AVG(CASE WHEN feedback_rating > 0 THEN feedback_rating * 5 END) as avg_rating
+        FROM `tabHD Ticket`
+        WHERE creation BETWEEN %(from_date)s AND %(to_date)s
+        AND _assign IS NOT NULL
+        AND _assign != '[]'
+        GROUP BY JSON_UNQUOTE(JSON_EXTRACT(_assign, '$[0]'))
+        ORDER BY tickets_handled DESC
+        LIMIT 10
+    """, {"from_date": from_date, "to_date": to_date}, as_dict=True)
+    
+    return {
+        "type": "axis",
+        "data": result,
+        "title": "Agent Performance Comparison",
+        "subtitle": "Tickets handled by each agent",
+        "xAxis": {"key": "agent", "type": "category", "title": "Agent"},
+        "yAxis": {"title": "Tickets Handled"},
+        "series": [{"name": "tickets_handled", "type": "bar"}]
+    }
+
+
+@frappe.whitelist()
+@agent_only
+def get_ticket_velocity_chart(filters=None):
+    """
+    Get ticket velocity chart showing created vs resolved over time
+    """
+    from_date = filters.get("from_date") if filters else frappe.utils.add_days(frappe.utils.nowdate(), -30)
+    to_date = filters.get("to_date") if filters else frappe.utils.nowdate()
+    
+    result = frappe.db.sql("""
+        SELECT 
+            DATE(creation) as date,
+            COUNT(name) as created,
+            COUNT(CASE WHEN status IN (
+                SELECT name FROM `tabHD Ticket Status` WHERE category = 'Resolved'
+            ) THEN name END) as resolved
+        FROM `tabHD Ticket`
+        WHERE creation BETWEEN %(from_date)s AND %(to_date)s
+        GROUP BY DATE(creation)
+        ORDER BY DATE(creation)
+    """, {"from_date": from_date, "to_date": to_date}, as_dict=True)
+    
+    return {
+        "type": "axis",
+        "data": result,
+        "title": "Ticket Velocity",
+        "subtitle": "Tickets created vs resolved over time",
+        "xAxis": {"key": "date", "type": "datetime", "title": "Date"},
+        "yAxis": {"title": "Number of Tickets"},
+        "series": [
+            {"name": "created", "type": "line"},
+            {"name": "resolved", "type": "line"}
+        ]
+    }
+
+
+@frappe.whitelist()
+@agent_only
+def get_team_performance(filters=None):
+    """
+    Get team performance data for managers
+    """
+    user = frappe.session.user
+    is_manager = "Agent Manager" in frappe.get_roles(user)
+    
+    if not is_manager:
+        frappe.throw(_("You don't have permission to view team performance."))
+    
+    from_date = filters.get("from_date") if filters else frappe.utils.add_days(frappe.utils.nowdate(), -30)
+    to_date = filters.get("to_date") if filters else frappe.utils.nowdate()
+    
+    result = frappe.db.sql("""
+        SELECT 
+            JSON_UNQUOTE(JSON_EXTRACT(t._assign, '$[0]')) as agent,
+            u.full_name,
+            COUNT(t.name) as tickets_resolved,
+            AVG(CASE WHEN t.first_response_time IS NOT NULL THEN t.first_response_time / 3600 END) as avg_response_time,
+            AVG(CASE WHEN t.feedback_rating > 0 THEN t.feedback_rating * 5 END) as csat_score,
+            (COUNT(CASE WHEN t.agreement_status = 'Fulfilled' THEN t.name END) / COUNT(t.name) * 100) as sla_compliance
+        FROM `tabHD Ticket` t
+        LEFT JOIN `tabUser` u ON u.name = JSON_UNQUOTE(JSON_EXTRACT(t._assign, '$[0]'))
+        WHERE t.creation BETWEEN %(from_date)s AND %(to_date)s
+        AND t._assign IS NOT NULL
+        AND t._assign != '[]'
+        AND t.status IN (
+            SELECT name FROM `tabHD Ticket Status` WHERE category = 'Resolved'
+        )
+        GROUP BY JSON_UNQUOTE(JSON_EXTRACT(t._assign, '$[0]')), u.full_name
+        ORDER BY tickets_resolved DESC
+    """, {"from_date": from_date, "to_date": to_date}, as_dict=True)
+    
+    return result
+
+
+@frappe.whitelist()
+@agent_only
+def get_recent_activities(page=1, filter_type="All", page_size=20):
+    """
+    Get recent activities for the dashboard timeline
+    """
+    user = frappe.session.user
+    is_manager = "Agent Manager" in frappe.get_roles(user)
+    
+    activities = []
+    
+    # Get recent ticket creation activities
+    try:
+        recent_tickets = frappe.get_all(
+            "HD Ticket",
+            fields=["name", "subject", "status", "priority", "creation", "owner", "_assign"],
+            filters={
+                "creation": [">=", frappe.utils.add_days(frappe.utils.nowdate(), -7)]
+            },
+            order_by="creation desc",
+            limit=int(page_size) // 2
+        )
+        
+        for ticket in recent_tickets:
+            activities.append({
+                "id": f"ticket_created_{ticket.name}",
+                "title": "New Ticket Created",
+                "description": ticket.subject,
+                "type": "ticket_created",
+                "timestamp": ticket.creation,
+                "user": ticket.owner,
+                "details": {
+                    "ticket": ticket.name,
+                    "priority": ticket.priority,
+                    "status": ticket.status
+                }
+            })
+    except Exception as e:
+        frappe.log_error(f"Error fetching recent tickets: {str(e)}")
+    
+    # Get recent status changes (simplified approach)
+    try:
+        recent_updates = frappe.db.sql("""
+            SELECT 
+                name,
+                subject,
+                status,
+                priority,
+                modified,
+                modified_by
+            FROM `tabHD Ticket`
+            WHERE modified >= %(from_date)s
+            AND modified != creation
+            ORDER BY modified DESC
+            LIMIT %(limit)s
+        """, {
+            "from_date": frappe.utils.add_days(frappe.utils.nowdate(), -3),
+            "limit": int(page_size) // 2
+        }, as_dict=True)
+        
+        for update in recent_updates:
+            activities.append({
+                "id": f"ticket_updated_{update.name}_{update.modified}",
+                "title": "Ticket Updated",
+                "description": f"Status changed for: {update.subject}",
+                "type": "ticket_update",
+                "timestamp": update.modified,
+                "user": update.modified_by,
+                "details": {
+                    "ticket": update.name,
+                    "status": update.status,
+                    "priority": update.priority
+                }
+            })
+    except Exception as e:
+        frappe.log_error(f"Error fetching ticket updates: {str(e)}")
+    
+    # Sort activities by timestamp
+    activities.sort(key=lambda x: x["timestamp"], reverse=True)
+    
+    # Filter by type if specified
+    if filter_type != "All":
+        activities = [a for a in activities if a["type"] == filter_type]
+    
+    return activities[:int(page_size)]
+
+
+@frappe.whitelist()
+def get_dashboard_notifications():
+    """Get notifications for the dashboard"""
+    user = frappe.session.user
+    
+    # Get unassigned tickets (no assignment)
+    unassigned_count = frappe.db.count('HD Ticket', {
+        '_assign': ['is', 'not set'],
+        'status': ['not in', ['Closed', 'Resolved']]
+    })
+    
+    # Get overdue tickets
+    overdue_count = frappe.db.count('HD Ticket', {
+        'status': ['not in', ['Closed', 'Resolved']],
+        'resolution_by': ['<', frappe.utils.now()]
+    })
+    
+    # Get new tickets assigned to user (in the last 24 hours)
+    new_tickets = frappe.db.count('HD Ticket', {
+        '_assign': ['like', f'%{user}%'],
+        'status': 'Open',
+        'modified': ['>', frappe.utils.add_to_date(frappe.utils.now(), hours=-24)]
+    })
+    
+    notifications = []
+    
+    if unassigned_count > 0:
+        notifications.append({
+            'id': 'unassigned',
+            'title': f'{unassigned_count} Unassigned Tickets',
+            'message': 'These tickets need assignment',
+            'type': 'warning',
+            'timestamp': frappe.utils.now(),
+            'action': 'View Tickets'
+        })
+    
+    if overdue_count > 0:
+        notifications.append({
+            'id': 'overdue',
+            'title': f'{overdue_count} Overdue Tickets',
+            'message': 'These tickets are past their due date',
+            'type': 'error',
+            'timestamp': frappe.utils.now(),
+            'action': 'Review Tickets'
+        })
+    
+    if new_tickets > 0:
+        notifications.append({
+            'id': 'new_assigned',
+            'title': f'{new_tickets} New Tickets Assigned',
+            'message': 'You have new tickets to work on',
+            'type': 'info',
+            'timestamp': frappe.utils.now(),
+            'action': 'View My Tickets'
+        })
+    
+    return notifications
+
+
+@frappe.whitelist()
+def get_quick_action_counts():
+    """Get counts for quick action buttons"""
+    user = frappe.session.user
+    
+    # Get open status names
+    open_statuses = frappe.get_all("HD Ticket Status", 
+                                  filters={"category": "Open"}, 
+                                  pluck="name")
+    
+    return {
+        'my_tickets': frappe.db.count('HD Ticket', {
+            '_assign': ['like', f'%{user}%'],
+            'status': ['in', open_statuses]
+        }),
+        'unassigned': frappe.db.count('HD Ticket', {
+            '_assign': ['is', 'not set'],
+            'status': ['in', open_statuses]
+        }),
+        'urgent': frappe.db.count('HD Ticket', {
+            'priority': 'High', 
+            'status': ['in', open_statuses]
+        }),
+        'overdue': frappe.db.count('HD Ticket', {
+            'status': ['in', open_statuses],
+            'resolution_by': ['<', frappe.utils.now()]
+        })
+    }
+    

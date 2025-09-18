@@ -96,3 +96,12 @@
 2025-09-18 15:15:10,953 Cleaning registries for queue: home-trieu-D-app-frappe-bench:short
 2025-09-18 15:15:10,953 Cleaning registries for queue: home-trieu-D-app-frappe-bench:default
 2025-09-18 15:15:10,954 Cleaning registries for queue: home-trieu-D-app-frappe-bench:long
+2025-09-18 16:31:18,361 Worker rq:worker:6e02b3a1e0af48dca6410b2a121f6387 started with PID 12034, version 2.4.0
+2025-09-18 16:31:18,362 Subscribing to channel rq:pubsub:6e02b3a1e0af48dca6410b2a121f6387
+2025-09-18 16:31:18,362 *** Listening on home-trieu-D-app-frappe-bench:short, home-trieu-D-app-frappe-bench:default, home-trieu-D-app-frappe-bench:long...
+2025-09-18 16:31:18,363 Cleaning registries for queue: home-trieu-D-app-frappe-bench:short
+2025-09-18 16:31:18,364 Cleaning registries for queue: home-trieu-D-app-frappe-bench:default
+2025-09-18 16:31:18,364 Cleaning registries for queue: home-trieu-D-app-frappe-bench:long
+2025-09-18 16:44:48,519 Cleaning registries for queue: home-trieu-D-app-frappe-bench:short
+2025-09-18 16:44:48,527 Cleaning registries for queue: home-trieu-D-app-frappe-bench:default
+2025-09-18 16:44:48,528 Cleaning registries for queue: home-trieu-D-app-frappe-bench:long

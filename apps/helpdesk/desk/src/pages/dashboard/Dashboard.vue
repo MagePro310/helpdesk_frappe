@@ -4,7 +4,28 @@
       <template #left-header>
         <div class="text-lg font-medium text-gray-900">Dashboard</div>
       </template>
-      <template #right-header> </template>
+      <template #right-header>
+        <div class="flex items-center gap-2">
+          <!-- Export Button -->
+          <Dropdown :options="exportOptions">
+            <template #default>
+              <Button variant="outline" size="sm">
+                <template #prefix>
+                  <LucideDownload class="size-4" />
+                </template>
+                Export
+              </Button>
+            </template>
+          </Dropdown>
+          
+          <!-- Dashboard Settings -->
+          <Button variant="ghost" size="sm" @click="openDashboardSettings">
+            <template #prefix>
+              <LucideSettings class="size-4" />
+            </template>
+          </Button>
+        </div>
+      </template>
     </LayoutHeader>
 
     <div class="p-5 w-full overflow-y-scroll">
@@ -79,9 +100,27 @@
       </div>
       <!-- Charts -->
       <div v-if="!loading" class="transition-all animate-fade-in duration-300">
+        <!-- Enhanced Dashboard Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
+          <!-- Quick Actions Widget -->
+          <div class="lg:col-span-1">
+            <QuickActionsWidget />
+          </div>
+          
+          <!-- Real-time Notifications -->
+          <div class="lg:col-span-1">
+            <NotificationsPanel />
+          </div>
+          
+          <!-- Recent Activity Timeline -->
+          <div class="lg:col-span-2">
+            <RecentActivityTimeline />
+          </div>
+        </div>
+
         <!-- Number Cards -->
         <div
-          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6"
           v-if="!numberCards.loading"
         >
           <Tooltip
@@ -95,6 +134,12 @@
             />
           </Tooltip>
         </div>
+
+        <!-- Performance Analytics Section -->
+        <div class="mb-6">
+          <PerformanceAnalytics :filters="filters" />
+        </div>
+
         <!-- Trend Charts -->
         <div
           class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4"
@@ -136,6 +181,10 @@
 <script setup lang="ts">
 import { Link } from "@/components";
 import { useAuthStore } from "@/stores/auth";
+import NotificationsPanel from "@/components/dashboard/NotificationsPanel.vue";
+import QuickActionsWidget from "@/components/dashboard/QuickActionsWidget.vue";
+import PerformanceAnalytics from "@/components/dashboard/PerformanceAnalytics.vue";
+import RecentActivityTimeline from "@/components/dashboard/RecentActivityTimeline.vue";
 import {
   AxisChart,
   createResource,
@@ -146,6 +195,8 @@ import {
   NumberChart,
   Tooltip,
   usePageMeta,
+  Button,
+  call,
 } from "frappe-ui";
 import { computed, h, onMounted, reactive, ref, watch } from "vue";
 
@@ -209,6 +260,62 @@ const teamMembers = createResource({
     agentFilter.value = { name: ["in", data] };
   },
 });
+
+// Export options
+const exportOptions = computed(() => [
+  {
+    label: "Export as PDF",
+    onClick: () => exportDashboard("pdf"),
+  },
+  {
+    label: "Export as Excel",
+    onClick: () => exportDashboard("excel"),
+  },
+  {
+    label: "Schedule Report",
+    onClick: () => scheduleReport(),
+  },
+]);
+
+// Dashboard functions
+const exportDashboard = async (format: string) => {
+  try {
+    const response = await call({
+      method: "helpdesk.api.dashboard.export_dashboard_data",
+      args: {
+        format: format,
+        filters: {
+          from_date: filters.period?.split(",")[0] || null,
+          to_date: filters.period?.split(",")[1] || null,
+          agent: filters.agent || null,
+          team: filters.team || null,
+        },
+      },
+    });
+    
+    if (response.file_url) {
+      // Download the file
+      const link = document.createElement("a");
+      link.href = response.file_url;
+      link.download = response.filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  } catch (error) {
+    console.error("Export failed:", error);
+  }
+};
+
+const scheduleReport = () => {
+  // Open schedule report modal
+  console.log("Schedule report functionality would be implemented here");
+};
+
+const openDashboardSettings = () => {
+  // Open dashboard customization settings
+  console.log("Dashboard settings would be implemented here");
+};
 
 watch(
   () => filters.team,
