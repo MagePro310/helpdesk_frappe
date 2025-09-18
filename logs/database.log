@@ -1,0 +1,160 @@
+2025-09-18 13:28:51,595 WARNING database DDL Query made to DB:
+create table `tabHD Desk Account Request` (
+			name varchar(140) primary key,
+			creation datetime(6),
+			modified datetime(6),
+			modified_by varchar(140),
+			owner varchar(140),
+			docstatus tinyint not null default '0',
+			idx int not null default '0',
+			`request_key` varchar(140),
+`ip_address` varchar(140),
+`email` varchar(140) UNIQUE,
+`user` varchar(140),
+`_user_tags` text,
+`_comments` text,
+`_assign` text,
+`_liked_by` text,
+index creation(creation),
+index modified(modified))
+			ENGINE=InnoDB
+			ROW_FORMAT=DYNAMIC
+			CHARACTER SET=utf8mb4
+			COLLATE=utf8mb4_unicode_ci
+2025-09-18 13:28:51,618 WARNING database DDL Query made to DB:
+create table `tabHD Agent` (
+			name varchar(140) primary key,
+			creation datetime(6),
+			modified datetime(6),
+			modified_by varchar(140),
+			owner varchar(140),
+			docstatus tinyint not null default '0',
+			idx int not null default '0',
+			`user` varchar(140),
+`agent_name` varchar(140),
+`user_image` varchar(140),
+`is_active` tinyint(4) NOT NULL DEFAULT 1,
+`_user_tags` text,
+`_comments` text,
+`_assign` text,
+`_liked_by` text,
+index creation(creation),
+index modified(modified))
+			ENGINE=InnoDB
+			ROW_FORMAT=DYNAMIC
+			CHARACTER SET=utf8mb4
+			COLLATE=utf8mb4_unicode_ci
+2025-09-18 13:28:51,644 WARNING database DDL Query made to DB:
+create table `tabHD Form Script` (
+			name varchar(140) primary key,
+			creation datetime(6),
+			modified datetime(6),
+			modified_by varchar(140),
+			owner varchar(140),
+			docstatus tinyint not null default '0',
+			idx int not null default '0',
+			`dt` varchar(140) DEFAULT 'HD Ticket',
+`apply_to` varchar(140) DEFAULT 'Form',
+`enabled` tinyint(4) NOT NULL DEFAULT 0,
+`is_standard` tinyint(4) NOT NULL DEFAULT 0,
+`apply_to_customer_portal` tinyint(4) NOT NULL DEFAULT 0,
+`apply_on_new_page` tinyint(4) NOT NULL DEFAULT 0,
+`script` longtext DEFAULT 'function setupForm({doc, updateField, call, router, toast, $dialog, createToast ,applyFilters}) {\n    return {\n        actions: [],\n        onChange:{\n            \"fieldname\":(newVal)=>console.log(newVal)\n        }\n    }\n}',
+`_user_tags` text,
+`_comments` text,
+`_assign` text,
+`_liked_by` text,
+index creation(creation))
+			ENGINE=InnoDB
+			ROW_FORMAT=DYNAMIC
+			CHARACTER SET=utf8mb4
+			COLLATE=utf8mb4_unicode_ci
+2025-09-18 13:28:51,671 WARNING database DDL Query made to DB:
+create table `tabHD Article Feedback` (
+			name varchar(140) primary key,
+			creation datetime(6),
+			modified datetime(6),
+			modified_by varchar(140),
+			owner varchar(140),
+			docstatus tinyint not null default '0',
+			idx int not null default '0',
+			`article` varchar(140),
+`user` varchar(140),
+`feedback` varchar(140),
+`_user_tags` text,
+`_comments` text,
+`_assign` text,
+`_liked_by` text,
+index creation(creation))
+			ENGINE=InnoDB
+			ROW_FORMAT=DYNAMIC
+			CHARACTER SET=utf8mb4
+			COLLATE=utf8mb4_unicode_ci
+2025-09-18 13:28:51,702 WARNING database DDL Query made to DB:
+create table `tabHD Team` (
+			name varchar(140) primary key,
+			creation datetime(6),
+			modified datetime(6),
+			modified_by varchar(140),
+			owner varchar(140),
+			docstatus tinyint not null default '0',
+			idx int not null default '0',
+			`team_name` varchar(140) UNIQUE,
+`assignment_rule` varchar(140),
+`ignore_restrictions` tinyint(4) NOT NULL DEFAULT 0,
+`_user_tags` text,
+`_comments` text,
+`_assign` text,
+`_liked_by` text,
+index creation(creation),
+index modified(modified))
+			ENGINE=InnoDB
+			ROW_FORMAT=DYNAMIC
+			CHARACTER SET=utf8mb4
+			COLLATE=utf8mb4_unicode_ci
+2025-09-18 13:28:51,727 WARNING database DDL Query made to DB:
+create table `tabHD Customer` (
+			name varchar(140) primary key,
+			creation datetime(6),
+			modified datetime(6),
+			modified_by varchar(140),
+			owner varchar(140),
+			docstatus tinyint not null default '0',
+			idx int not null default '0',
+			`image` text,
+`customer_name` varchar(140) UNIQUE,
+`domain` varchar(140),
+`_user_tags` text,
+`_comments` text,
+`_assign` text,
+`_liked_by` text,
+index creation(creation),
+index modified(modified))
+			ENGINE=InnoDB
+			ROW_FORMAT=DYNAMIC
+			CHARACTER SET=utf8mb4
+			COLLATE=utf8mb4_unicode_ci
+2025-09-18 13:28:51,749 WARNING database DDL Query made to DB:
+create table `tabHD Synonym` (
+			name varchar(140) primary key,
+			creation datetime(6),
+			modified datetime(6),
+			modified_by varchar(140),
+			owner varchar(140),
+			docstatus tinyint not null default '0',
+			idx int not null default '0',
+			`synonym` varchar(140) UNIQUE,
+parent varchar(140),
+parentfield varchar(140),
+parenttype varchar(140),
+index parent(parent))
+			ENGINE=InnoDB
+			ROW_FORMAT=DYNAMIC
+			CHARACTER SET=utf8mb4
+			COLLATE=utf8mb4_unicode_ci
+2025-09-18 13:28:52,089 WARNING database DDL Query made to DB:
+ALTER TABLE `tabAssignment Rule` ADD COLUMN `assign_condition_json` longtext, ADD COLUMN `unassign_condition_json` longtext
+2025-09-18 13:28:53,685 WARNING database DDL Query made to DB:
+ALTER TABLE `tabHD Ticket` ADD FULLTEXT INDEX `ft_subject` (`subject`)
+2025-09-18 13:28:53,694 WARNING database DDL Query made to DB:
+ALTER TABLE `tabHD Ticket` ADD FULLTEXT INDEX `ft_description` (`description`)

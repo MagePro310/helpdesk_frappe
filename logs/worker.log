@@ -1,0 +1,24 @@
+2025-09-18 13:26:12,836 Worker rq:worker:39ef50ae550e48cb96faa0b5fdd0e794 started with PID 13376, version 2.4.0
+2025-09-18 13:26:12,836 Subscribing to channel rq:pubsub:39ef50ae550e48cb96faa0b5fdd0e794
+2025-09-18 13:26:12,837 *** Listening on home-trieu-D-app-frappe-bench:short, home-trieu-D-app-frappe-bench:default, home-trieu-D-app-frappe-bench:long...
+2025-09-18 13:26:12,837 Cleaning registries for queue: home-trieu-D-app-frappe-bench:short
+2025-09-18 13:26:12,838 Cleaning registries for queue: home-trieu-D-app-frappe-bench:default
+2025-09-18 13:26:12,839 Cleaning registries for queue: home-trieu-D-app-frappe-bench:long
+2025-09-18 13:28:00,486 Worker 39ef50ae550e48cb96faa0b5fdd0e794 [PID 13376]: warm shut down requested
+2025-09-18 13:28:00,493 Unsubscribing from channel rq:pubsub:39ef50ae550e48cb96faa0b5fdd0e794
+2025-09-18 13:28:17,386 Worker rq:worker:40a444e4b73542d7a6b32f249aafdc09 started with PID 17227, version 2.4.0
+2025-09-18 13:28:17,386 Subscribing to channel rq:pubsub:40a444e4b73542d7a6b32f249aafdc09
+2025-09-18 13:28:17,387 *** Listening on home-trieu-D-app-frappe-bench:short, home-trieu-D-app-frappe-bench:default, home-trieu-D-app-frappe-bench:long...
+2025-09-18 13:28:17,387 Cleaning registries for queue: home-trieu-D-app-frappe-bench:short
+2025-09-18 13:28:17,388 Cleaning registries for queue: home-trieu-D-app-frappe-bench:default
+2025-09-18 13:28:17,388 Cleaning registries for queue: home-trieu-D-app-frappe-bench:long
+2025-09-18 13:30:43,876 Worker 40a444e4b73542d7a6b32f249aafdc09 [PID 17227]: warm shut down requested
+2025-09-18 13:30:43,877 Unsubscribing from channel rq:pubsub:40a444e4b73542d7a6b32f249aafdc09
+2025-09-18 13:32:01,198 Worker rq:worker:1b9825a2ca654ba99af762b4a222a6e8 started with PID 23270, version 2.4.0
+2025-09-18 13:32:01,198 Subscribing to channel rq:pubsub:1b9825a2ca654ba99af762b4a222a6e8
+2025-09-18 13:32:01,199 *** Listening on home-trieu-D-app-frappe-bench:short, home-trieu-D-app-frappe-bench:default, home-trieu-D-app-frappe-bench:long...
+2025-09-18 13:32:01,199 Cleaning registries for queue: home-trieu-D-app-frappe-bench:short
+2025-09-18 13:32:01,200 Cleaning registries for queue: home-trieu-D-app-frappe-bench:default
+2025-09-18 13:32:01,200 Cleaning registries for queue: home-trieu-D-app-frappe-bench:long
+2025-09-18 13:32:17,468 Worker 1b9825a2ca654ba99af762b4a222a6e8 [PID 23270]: warm shut down requested
+2025-09-18 13:32:17,469 Unsubscribing from channel rq:pubsub:1b9825a2ca654ba99af762b4a222a6e8

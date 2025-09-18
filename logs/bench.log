@@ -1,0 +1,55 @@
+2025-09-18 13:24:10,513 DEBUG cd frappe-bench && python3 -m venv env
+2025-09-18 13:24:12,521 DEBUG cd frappe-bench && /home/trieu/D/app/frappe-bench/env/bin/python -m pip install --quiet --upgrade pip
+2025-09-18 13:24:13,754 DEBUG cd frappe-bench && /home/trieu/D/app/frappe-bench/env/bin/python -m pip install --quiet wheel
+2025-09-18 13:24:14,426 LOG Getting frappe
+2025-09-18 13:24:14,426 DEBUG cd frappe-bench/apps && git clone https://github.com/frappe/frappe.git  --depth 1 --origin upstream
+2025-09-18 13:24:31,173 LOG Installing frappe
+2025-09-18 13:24:31,174 DEBUG cd /home/trieu/D/app/frappe-bench && /home/trieu/D/app/frappe-bench/env/bin/python -m pip install --quiet --upgrade -e /home/trieu/D/app/frappe-bench/apps/frappe 
+2025-09-18 13:24:58,446 DEBUG cd /home/trieu/D/app/frappe-bench/apps/frappe && yarn install --check-files
+2025-09-18 13:25:02,080 DEBUG cd frappe-bench && bench build
+2025-09-18 13:25:02,171 INFO /home/trieu/anaconda3/bin/bench build
+2025-09-18 13:25:15,320 LOG setting up backups
+2025-09-18 13:25:15,330 LOG backups were set up
+2025-09-18 13:25:15,330 INFO Bench frappe-bench initialized
+2025-09-18 13:26:12,360 INFO /home/trieu/anaconda3/bin/bench start
+2025-09-18 13:26:12,551 INFO /home/trieu/anaconda3/bin/bench serve --port 8000
+2025-09-18 13:26:12,551 INFO /home/trieu/anaconda3/bin/bench schedule
+2025-09-18 13:26:12,552 INFO /home/trieu/anaconda3/bin/bench worker
+2025-09-18 13:26:12,554 INFO /home/trieu/anaconda3/bin/bench watch
+2025-09-18 13:26:23,212 INFO /home/trieu/anaconda3/bin/bench new-site helpdesk.test
+2025-09-18 13:26:45,235 INFO /home/trieu/anaconda3/bin/bench --site helpdesk.test add-to-hosts
+2025-09-18 13:26:55,379 INFO /home/trieu/anaconda3/bin/bench get-app https://github.com/frappe/helpdesk
+2025-09-18 13:26:55,384 LOG Getting helpdesk
+2025-09-18 13:26:55,384 DEBUG cd ./apps && git clone https://github.com/frappe/helpdesk  --depth 1 --origin upstream
+2025-09-18 13:26:59,711 LOG Installing helpdesk
+2025-09-18 13:26:59,711 DEBUG cd /home/trieu/D/app/frappe-bench && /home/trieu/D/app/frappe-bench/env/bin/python -m pip install --quiet --upgrade -e /home/trieu/D/app/frappe-bench/apps/helpdesk 
+2025-09-18 13:27:02,489 DEBUG cd /home/trieu/D/app/frappe-bench/apps/helpdesk && yarn install --check-files
+2025-09-18 13:27:10,928 DEBUG bench build --app helpdesk
+2025-09-18 13:27:11,021 INFO /home/trieu/anaconda3/bin/bench build --app helpdesk
+2025-09-18 13:28:00,680 INFO /home/trieu/anaconda3/bin/bench get-app https://github.com/frappe/telephony
+2025-09-18 13:28:00,686 LOG Getting telephony
+2025-09-18 13:28:00,686 DEBUG cd ./apps && git clone https://github.com/frappe/telephony  --depth 1 --origin upstream
+2025-09-18 13:28:02,692 LOG Installing telephony
+2025-09-18 13:28:02,692 DEBUG cd /home/trieu/D/app/frappe-bench && /home/trieu/D/app/frappe-bench/env/bin/python -m pip install --quiet --upgrade -e /home/trieu/D/app/frappe-bench/apps/telephony 
+2025-09-18 13:28:07,167 DEBUG bench build --app telephony
+2025-09-18 13:28:07,264 INFO /home/trieu/anaconda3/bin/bench build --app telephony
+2025-09-18 13:28:16,858 INFO /home/trieu/anaconda3/bin/bench start
+2025-09-18 13:28:17,090 INFO /home/trieu/anaconda3/bin/bench serve --port 8000
+2025-09-18 13:28:17,091 INFO /home/trieu/anaconda3/bin/bench schedule
+2025-09-18 13:28:17,091 INFO /home/trieu/anaconda3/bin/bench watch
+2025-09-18 13:28:17,093 INFO /home/trieu/anaconda3/bin/bench worker
+2025-09-18 13:28:23,555 INFO /home/trieu/anaconda3/bin/bench get-app https://github.com/frappe/telephony
+2025-09-18 13:28:25,172 INFO App moved from apps/telephony to archived/apps/telephony-2025-09-18
+2025-09-18 13:28:25,175 LOG Getting telephony
+2025-09-18 13:28:25,175 DEBUG cd ./apps && git clone https://github.com/frappe/telephony  --depth 1 --origin upstream
+2025-09-18 13:28:26,502 LOG Installing telephony
+2025-09-18 13:28:26,503 DEBUG cd /home/trieu/D/app/frappe-bench && /home/trieu/D/app/frappe-bench/env/bin/python -m pip install --quiet --upgrade -e /home/trieu/D/app/frappe-bench/apps/telephony 
+2025-09-18 13:28:28,026 DEBUG bench build --app telephony
+2025-09-18 13:28:28,132 INFO /home/trieu/anaconda3/bin/bench build --app telephony
+2025-09-18 13:28:48,900 INFO /home/trieu/anaconda3/bin/bench --site helpdesk.test install-app helpdesk
+2025-09-18 13:29:00,284 INFO /home/trieu/anaconda3/bin/bench build --app helpdesk
+2025-09-18 13:32:00,713 INFO /home/trieu/anaconda3/bin/bench start
+2025-09-18 13:32:00,904 INFO /home/trieu/anaconda3/bin/bench watch
+2025-09-18 13:32:00,905 INFO /home/trieu/anaconda3/bin/bench serve --port 8000
+2025-09-18 13:32:00,906 INFO /home/trieu/anaconda3/bin/bench schedule
+2025-09-18 13:32:00,907 INFO /home/trieu/anaconda3/bin/bench worker
