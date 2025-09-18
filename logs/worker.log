@@ -62,3 +62,37 @@
 2025-09-18 13:37:53,834 Cleaning registries for queue: home-trieu-D-app-frappe-bench:long
 2025-09-18 13:38:09,194 Worker 8a0fca0f20db4405be98ce1dabe333ef [PID 31531]: warm shut down requested
 2025-09-18 13:38:09,195 Unsubscribing from channel rq:pubsub:8a0fca0f20db4405be98ce1dabe333ef
+2025-09-18 14:19:55,241 Worker rq:worker:00738c0cf9764d9f9e590a6542852a57 started with PID 75669, version 2.4.0
+2025-09-18 14:19:55,241 Subscribing to channel rq:pubsub:00738c0cf9764d9f9e590a6542852a57
+2025-09-18 14:19:55,242 *** Listening on home-trieu-D-app-frappe-bench:short, home-trieu-D-app-frappe-bench:default, home-trieu-D-app-frappe-bench:long...
+2025-09-18 14:19:55,242 Cleaning registries for queue: home-trieu-D-app-frappe-bench:short
+2025-09-18 14:19:55,243 Cleaning registries for queue: home-trieu-D-app-frappe-bench:default
+2025-09-18 14:19:55,244 Cleaning registries for queue: home-trieu-D-app-frappe-bench:long
+2025-09-18 14:20:04,824 Worker 00738c0cf9764d9f9e590a6542852a57 [PID 75669]: warm shut down requested
+2025-09-18 14:20:04,825 Unsubscribing from channel rq:pubsub:00738c0cf9764d9f9e590a6542852a57
+2025-09-18 14:22:02,860 Worker rq:worker:2bf4d8b46a7043c19d3442b4c11f9e9f started with PID 10826, version 2.4.0
+2025-09-18 14:22:02,860 Subscribing to channel rq:pubsub:2bf4d8b46a7043c19d3442b4c11f9e9f
+2025-09-18 14:22:02,861 *** Listening on home-trieu-D-app-frappe-bench:short, home-trieu-D-app-frappe-bench:default, home-trieu-D-app-frappe-bench:long...
+2025-09-18 14:22:02,861 Cleaning registries for queue: home-trieu-D-app-frappe-bench:short
+2025-09-18 14:22:02,862 Cleaning registries for queue: home-trieu-D-app-frappe-bench:default
+2025-09-18 14:22:02,862 Cleaning registries for queue: home-trieu-D-app-frappe-bench:long
+2025-09-18 14:35:33,045 Cleaning registries for queue: home-trieu-D-app-frappe-bench:short
+2025-09-18 14:35:33,046 Cleaning registries for queue: home-trieu-D-app-frappe-bench:default
+2025-09-18 14:35:33,047 Cleaning registries for queue: home-trieu-D-app-frappe-bench:long
+2025-09-18 14:48:09,704 home-trieu-D-app-frappe-bench:default: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.core.doctype.user.user.create_contact', kwargs={'user': <User: doctype=User trieu10ly2019@gmail.com>, 'ignore_mandatory': ..., method='frappe.core.doctype.user.user.create_contact', site='helpdesk.test', user='Administrator') (helpdesk.test||dac67b17-ce04-45b9-8960-5a59cce92686)
+2025-09-18 14:48:10,469 Successfully completed frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.core.doctype.user.user.create_contact', kwargs={'user': <User: doctype=User trieu10ly2019@gmail.com>, 'ignore_mandatory': ..., method='frappe.core.doctype.user.user.create_contact', site='helpdesk.test', user='Administrator') job in 0:00:00.570477s on worker 2bf4d8b46a7043c19d3442b4c11f9e9f
+2025-09-18 14:48:10,469 home-trieu-D-app-frappe-bench:default: Job OK (helpdesk.test||dac67b17-ce04-45b9-8960-5a59cce92686)
+2025-09-18 14:48:10,469 Result is kept for 600 seconds
+2025-09-18 14:48:10,477 Cleaning registries for queue: home-trieu-D-app-frappe-bench:short
+2025-09-18 14:48:10,478 Cleaning registries for queue: home-trieu-D-app-frappe-bench:default
+2025-09-18 14:48:10,478 Cleaning registries for queue: home-trieu-D-app-frappe-bench:long
+2025-09-18 14:48:10,479 home-trieu-D-app-frappe-bench:default: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.core.doctype.user.user.update_gravatar', kwargs={'name': 'trieu10ly2019@gmail.com'}, method='frappe.core.doctype.user.user.update_gravatar', site='helpdesk.test', user='Administrator') (helpdesk.test||3c932b9f-fa41-49b3-bcc0-d8c34152f276)
+2025-09-18 14:48:10,748 Successfully completed frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.core.doctype.user.user.update_gravatar', kwargs={'name': 'trieu10ly2019@gmail.com'}, method='frappe.core.doctype.user.user.update_gravatar', site='helpdesk.test', user='Administrator') job in 0:00:00.264435s on worker 2bf4d8b46a7043c19d3442b4c11f9e9f
+2025-09-18 14:48:10,748 home-trieu-D-app-frappe-bench:default: Job OK (helpdesk.test||3c932b9f-fa41-49b3-bcc0-d8c34152f276)
+2025-09-18 14:48:10,748 Result is kept for 600 seconds
+2025-09-18 15:01:40,839 Cleaning registries for queue: home-trieu-D-app-frappe-bench:short
+2025-09-18 15:01:40,841 Cleaning registries for queue: home-trieu-D-app-frappe-bench:default
+2025-09-18 15:01:40,842 Cleaning registries for queue: home-trieu-D-app-frappe-bench:long
+2025-09-18 15:15:10,953 Cleaning registries for queue: home-trieu-D-app-frappe-bench:short
+2025-09-18 15:15:10,953 Cleaning registries for queue: home-trieu-D-app-frappe-bench:default
+2025-09-18 15:15:10,954 Cleaning registries for queue: home-trieu-D-app-frappe-bench:long

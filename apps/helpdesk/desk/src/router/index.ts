@@ -112,11 +112,27 @@ const routes = [
     component: () => import("@/pages/call-logs/CallLogs.vue"),
   },
 
+  // Tutorial Routes
+  {
+    path: "/tutorial/admin",
+    name: "AdminTutorial",
+    component: () => import("@/pages/tutorial/AdminTutorial.vue"),
+  },
+
   // Customer Portal Routes
   {
     path: "/my-tickets",
     name: "TicketsCustomer",
     component: () => import("@/pages/ticket/Tickets.vue"),
+    meta: {
+      public: true,
+      auth: true,
+    },
+  },
+  {
+    path: "/user",
+    name: "UserTutorial",
+    component: () => import("@/pages/tutorial/UserTutorial.vue"),
     meta: {
       public: true,
       auth: true,
