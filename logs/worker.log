@@ -22,3 +22,43 @@
 2025-09-18 13:32:01,200 Cleaning registries for queue: home-trieu-D-app-frappe-bench:long
 2025-09-18 13:32:17,468 Worker 1b9825a2ca654ba99af762b4a222a6e8 [PID 23270]: warm shut down requested
 2025-09-18 13:32:17,469 Unsubscribing from channel rq:pubsub:1b9825a2ca654ba99af762b4a222a6e8
+2025-09-18 13:34:26,477 Worker rq:worker:fc5145025d6a49d78f279daad4c61614 started with PID 25674, version 2.4.0
+2025-09-18 13:34:26,477 Subscribing to channel rq:pubsub:fc5145025d6a49d78f279daad4c61614
+2025-09-18 13:34:26,478 *** Listening on home-trieu-D-app-frappe-bench:short, home-trieu-D-app-frappe-bench:default, home-trieu-D-app-frappe-bench:long...
+2025-09-18 13:34:26,478 Cleaning registries for queue: home-trieu-D-app-frappe-bench:short
+2025-09-18 13:34:26,479 Cleaning registries for queue: home-trieu-D-app-frappe-bench:default
+2025-09-18 13:34:26,480 Cleaning registries for queue: home-trieu-D-app-frappe-bench:long
+2025-09-18 13:35:13,671 Worker fc5145025d6a49d78f279daad4c61614 [PID 25674]: warm shut down requested
+2025-09-18 13:35:13,672 Unsubscribing from channel rq:pubsub:fc5145025d6a49d78f279daad4c61614
+2025-09-18 13:36:12,080 Worker rq:worker:50d06fed53944952834b91ddfc2b681c started with PID 27656, version 2.4.0
+2025-09-18 13:36:12,080 Subscribing to channel rq:pubsub:50d06fed53944952834b91ddfc2b681c
+2025-09-18 13:36:12,081 *** Listening on home-trieu-D-app-frappe-bench:short, home-trieu-D-app-frappe-bench:default, home-trieu-D-app-frappe-bench:long...
+2025-09-18 13:36:12,081 Cleaning registries for queue: home-trieu-D-app-frappe-bench:short
+2025-09-18 13:36:12,082 Cleaning registries for queue: home-trieu-D-app-frappe-bench:default
+2025-09-18 13:36:12,082 Cleaning registries for queue: home-trieu-D-app-frappe-bench:long
+2025-09-18 13:36:52,615 home-trieu-D-app-frappe-bench:default: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.core.doctype.user.user.create_contact', kwargs={'user': <User: doctype=User trieu10ly2019@gmail.com>, 'ignore_mandatory': ..., method='frappe.core.doctype.user.user.create_contact', site='helpdesk.test', user='Administrator') (helpdesk.test||40498347-b899-4acb-993f-c9acc603c290)
+2025-09-18 13:36:53,284 Successfully completed frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.core.doctype.user.user.create_contact', kwargs={'user': <User: doctype=User trieu10ly2019@gmail.com>, 'ignore_mandatory': ..., method='frappe.core.doctype.user.user.create_contact', site='helpdesk.test', user='Administrator') job in 0:00:00.513171s on worker 50d06fed53944952834b91ddfc2b681c
+2025-09-18 13:36:53,284 home-trieu-D-app-frappe-bench:default: Job OK (helpdesk.test||40498347-b899-4acb-993f-c9acc603c290)
+2025-09-18 13:36:53,284 Result is kept for 600 seconds
+2025-09-18 13:36:53,294 home-trieu-D-app-frappe-bench:default: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.core.doctype.user.user.update_gravatar', kwargs={'name': 'trieu10ly2019@gmail.com'}, method='frappe.core.doctype.user.user.update_gravatar', site='helpdesk.test', user='Administrator') (helpdesk.test||f50c23ac-366a-4dcb-952f-c432b70b4281)
+2025-09-18 13:36:53,597 Successfully completed frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.core.doctype.user.user.update_gravatar', kwargs={'name': 'trieu10ly2019@gmail.com'}, method='frappe.core.doctype.user.user.update_gravatar', site='helpdesk.test', user='Administrator') job in 0:00:00.297425s on worker 50d06fed53944952834b91ddfc2b681c
+2025-09-18 13:36:53,597 home-trieu-D-app-frappe-bench:default: Job OK (helpdesk.test||f50c23ac-366a-4dcb-952f-c432b70b4281)
+2025-09-18 13:36:53,597 Result is kept for 600 seconds
+2025-09-18 13:36:53,604 home-trieu-D-app-frappe-bench:default: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.core.doctype.user.user.create_contact', kwargs={'user': <User: doctype=User trieu10ly2019@gmail.com>, 'ignore_mandatory': ..., method='frappe.core.doctype.user.user.create_contact', site='helpdesk.test', user='Administrator') (helpdesk.test||3f5c6e43-7bab-4d4c-8269-4391e5eefb22)
+2025-09-18 13:36:54,164 Successfully completed frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.core.doctype.user.user.create_contact', kwargs={'user': <User: doctype=User trieu10ly2019@gmail.com>, 'ignore_mandatory': ..., method='frappe.core.doctype.user.user.create_contact', site='helpdesk.test', user='Administrator') job in 0:00:00.423529s on worker 50d06fed53944952834b91ddfc2b681c
+2025-09-18 13:36:54,164 home-trieu-D-app-frappe-bench:default: Job OK (helpdesk.test||3f5c6e43-7bab-4d4c-8269-4391e5eefb22)
+2025-09-18 13:36:54,164 Result is kept for 600 seconds
+2025-09-18 13:36:54,173 home-trieu-D-app-frappe-bench:default: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.core.doctype.user.user.update_gravatar', kwargs={'name': 'trieu10ly2019@gmail.com'}, method='frappe.core.doctype.user.user.update_gravatar', site='helpdesk.test', user='Administrator') (helpdesk.test||7d9be832-93a5-4313-87cf-5bb643827af4)
+2025-09-18 13:36:54,485 Successfully completed frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.core.doctype.user.user.update_gravatar', kwargs={'name': 'trieu10ly2019@gmail.com'}, method='frappe.core.doctype.user.user.update_gravatar', site='helpdesk.test', user='Administrator') job in 0:00:00.307583s on worker 50d06fed53944952834b91ddfc2b681c
+2025-09-18 13:36:54,486 home-trieu-D-app-frappe-bench:default: Job OK (helpdesk.test||7d9be832-93a5-4313-87cf-5bb643827af4)
+2025-09-18 13:36:54,486 Result is kept for 600 seconds
+2025-09-18 13:37:47,213 Worker 50d06fed53944952834b91ddfc2b681c [PID 27656]: warm shut down requested
+2025-09-18 13:37:47,214 Unsubscribing from channel rq:pubsub:50d06fed53944952834b91ddfc2b681c
+2025-09-18 13:37:53,831 Worker rq:worker:8a0fca0f20db4405be98ce1dabe333ef started with PID 31531, version 2.4.0
+2025-09-18 13:37:53,831 Subscribing to channel rq:pubsub:8a0fca0f20db4405be98ce1dabe333ef
+2025-09-18 13:37:53,832 *** Listening on home-trieu-D-app-frappe-bench:short, home-trieu-D-app-frappe-bench:default, home-trieu-D-app-frappe-bench:long...
+2025-09-18 13:37:53,832 Cleaning registries for queue: home-trieu-D-app-frappe-bench:short
+2025-09-18 13:37:53,833 Cleaning registries for queue: home-trieu-D-app-frappe-bench:default
+2025-09-18 13:37:53,834 Cleaning registries for queue: home-trieu-D-app-frappe-bench:long
+2025-09-18 13:38:09,194 Worker 8a0fca0f20db4405be98ce1dabe333ef [PID 31531]: warm shut down requested
+2025-09-18 13:38:09,195 Unsubscribing from channel rq:pubsub:8a0fca0f20db4405be98ce1dabe333ef
