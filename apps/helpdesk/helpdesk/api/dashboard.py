@@ -927,34 +927,130 @@ def get_ticket_velocity_chart(filters=None):
     """
     Get ticket velocity chart showing created vs resolved over time
     """
-    from_date = filters.get("from_date") if filters else frappe.utils.add_days(frappe.utils.nowdate(), -30)
-    to_date = filters.get("to_date") if filters else frappe.utils.nowdate()
-    
-    result = frappe.db.sql("""
-        SELECT 
-            DATE(creation) as date,
-            COUNT(name) as created,
-            COUNT(CASE WHEN status IN (
-                SELECT name FROM `tabHD Ticket Status` WHERE category = 'Resolved'
-            ) THEN name END) as resolved
+    filters = filters or {}
+
+    from_date = filters.get("from_date")
+    to_date = filters.get("to_date")
+
+    if not from_date:
+        from_date = frappe.utils.add_days(frappe.utils.nowdate(), -30)
+    if not to_date:
+        to_date = frappe.utils.nowdate()
+
+    agent = filters.get("agent")
+    if agent == "@me":
+        agent = frappe.session.user
+
+    team = filters.get("team")
+
+    base_conditions = []
+    sql_params = {
+        "from_date": from_date,
+        "to_date": to_date,
+    }
+
+    if team:
+        base_conditions.append("agent_group = %(team)s")
+        sql_params["team"] = team
+
+    if agent:
+        base_conditions.append(
+            "JSON_SEARCH(_assign, 'one', %(agent)s) IS NOT NULL"
+        )
+        sql_params["agent"] = agent
+
+    condition_sql = ""
+    if base_conditions:
+        condition_sql = " AND " + " AND ".join(base_conditions)
+
+    created_rows = frappe.db.sql(
+        f"""
+        SELECT
+            DATE(creation) AS bucket,
+            COUNT(name) AS total
         FROM `tabHD Ticket`
-        WHERE creation BETWEEN %(from_date)s AND %(to_date)s
+        WHERE creation >= %(from_date)s
+          AND creation < DATE_ADD(%(to_date)s, INTERVAL 1 DAY)
+          {condition_sql}
         GROUP BY DATE(creation)
         ORDER BY DATE(creation)
-    """, {"from_date": from_date, "to_date": to_date}, as_dict=True)
-    
-    return {
-        "type": "axis",
-        "data": result,
-        "title": "Ticket Velocity",
-        "subtitle": "Tickets created vs resolved over time",
-        "xAxis": {"key": "date", "type": "datetime", "title": "Date"},
-        "yAxis": {"title": "Number of Tickets"},
-        "series": [
-            {"name": "created", "type": "line"},
-            {"name": "resolved", "type": "line"}
-        ]
+        """,
+        sql_params,
+        as_dict=True,
+    )
+
+    resolved_rows = frappe.db.sql(
+        f"""
+        SELECT
+            DATE(resolution_date) AS bucket,
+            COUNT(name) AS total
+        FROM `tabHD Ticket`
+        WHERE resolution_date IS NOT NULL
+          AND resolution_date >= %(from_date)s
+          AND resolution_date < DATE_ADD(%(to_date)s, INTERVAL 1 DAY)
+          {condition_sql}
+        GROUP BY DATE(resolution_date)
+        ORDER BY DATE(resolution_date)
+        """,
+        sql_params,
+        as_dict=True,
+    )
+
+    created_lookup = {
+        str(row.bucket): row.total
+        for row in created_rows
     }
+    resolved_lookup = {
+        str(row.bucket): row.total
+        for row in resolved_rows
+    }
+
+    from_date_obj = frappe.utils.getdate(from_date)
+    to_date_obj = frappe.utils.getdate(to_date)
+    total_days = frappe.utils.date_diff(to_date_obj, from_date_obj)
+
+    data = []
+    total_created = 0
+    total_resolved = 0
+
+    for offset in range(total_days + 1):
+        current_date = frappe.utils.add_days(from_date_obj, offset)
+        if isinstance(current_date, str):
+            date_str = current_date
+        else:
+            date_str = current_date.isoformat()
+        created_count = created_lookup.get(date_str, 0)
+        resolved_count = resolved_lookup.get(date_str, 0)
+
+        total_created += created_count
+        total_resolved += resolved_count
+
+        data.append(
+            {
+                "date": date_str,
+                "created": created_count,
+                "resolved": resolved_count,
+            }
+        )
+
+    subtitle = _("{0} created • {1} resolved").format(total_created, total_resolved)
+
+    return get_bar_chart_config(
+        data,
+        _("Ticket Velocity"),
+        subtitle,
+        {
+            "key": "date",
+            "type": "time",
+            "title": _("Date"),
+            "timeGrain": "day",
+        },
+        _("Tickets"),
+        [
+            {"name": "created", "type": "line", "showDataPoints": True},
+            {"name": "resolved", "type": "line", "showDataPoints": True},
+        ],
+    )
 
 
 @frappe.whitelist()

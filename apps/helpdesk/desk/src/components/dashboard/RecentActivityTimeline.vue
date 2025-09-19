@@ -21,7 +21,7 @@
             <template #default>
               <button class="text-sm text-gray-600 hover:text-gray-800 flex items-center gap-1">
                 <LucideFilter class="size-4" />
-                {{ selectedFilter }}
+                {{ currentFilterLabel }}
                 <LucideChevronDown class="size-3" />
               </button>
             </template>
@@ -142,7 +142,7 @@
 
 <script setup lang="ts">
 import { createResource, Dropdown } from "frappe-ui";
-import { computed, onMounted, onUnmounted, ref, watch } from "vue";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import UserAvatar from "@/components/UserAvatar.vue";
 import { useTimeAgo } from "@vueuse/core";
@@ -161,14 +161,36 @@ const lastUpdated = computed(() =>
   lastRefresh.value ? lastUpdatedDisplay.value : null
 );
 
-const filterOptions = [
+const baseFilterOptions = [
   { label: "All", value: "All" },
   { label: "Ticket Updates", value: "ticket_update" },
   { label: "Assignments", value: "assignment" },
   { label: "Status Changes", value: "status_change" },
   { label: "Comments", value: "comment" },
-  { label: "SLA Events", value: "sla_event" }
+  { label: "SLA Events", value: "sla_event" },
 ];
+
+const handleFilterSelect = async (value: string) => {
+  if (selectedFilter.value === value) {
+    return;
+  }
+
+  selectedFilter.value = value;
+  await refreshActivities();
+};
+
+const filterOptions = computed(() =>
+  baseFilterOptions.map((option) => ({
+    label: option.label,
+    onClick: () => handleFilterSelect(option.value),
+  }))
+);
+
+const currentFilterLabel = computed(
+  () =>
+    baseFilterOptions.find((option) => option.value === selectedFilter.value)?.label ||
+    "All"
+);
 
 const activities = createResource({
   url: "helpdesk.api.dashboard.get_recent_activities",
@@ -305,10 +327,6 @@ const getUserDisplayName = (userId: string) => {
   // In a real implementation, you might want to cache user names
   return userId.split('@')[0] || userId;
 };
-
-watch(selectedFilter, () => {
-  refreshActivities();
-});
 
 let refreshInterval: number | null = null;
 

@@ -1,0 +1,62 @@
+2025-09-19 10:17:16,547 INFO ipython === bench console session ===
+2025-09-19 10:17:16,547 INFO ipython import frappe
+2025-09-19 10:17:16,547 INFO ipython print(frappe.db.sql("select name, _assign, agent_group, status, owner from `tabHD Ticket` limit 5", as_dict=1))
+2025-09-19 10:17:16,547 INFO ipython === session end ===
+2025-09-19 10:17:27,381 INFO ipython === bench console session ===
+2025-09-19 10:17:27,381 INFO ipython import frappe
+2025-09-19 10:17:27,381 INFO ipython print(frappe.db.sql("select JSON_UNQUOTE(JSON_EXTRACT(_assign, '$[0]')) as agent from `tabHD Ticket` where _assign is not null limit 5", as_dict=1))
+2025-09-19 10:17:27,381 INFO ipython === session end ===
+2025-09-19 10:17:37,750 INFO ipython === bench console session ===
+2025-09-19 10:17:37,751 INFO ipython import frappe
+2025-09-19 10:17:37,751 INFO ipython from frappe.utils import nowdate
+2025-09-19 10:17:37,751 INFO ipython print('today', nowdate())
+2025-09-19 10:17:37,751 INFO ipython print(frappe.db.sql("select name, creation from `tabHD Ticket` order by creation desc limit 5", as_dict=1))
+2025-09-19 10:17:37,751 INFO ipython === session end ===
+2025-09-19 10:17:47,979 INFO ipython === bench console session ===
+2025-09-19 10:17:47,979 INFO ipython import frappe
+2025-09-19 10:17:47,980 INFO ipython from helpdesk.helpdesk.api import dashboard
+2025-09-19 10:17:47,980 INFO ipython print(dashboard.get_agent_performance_chart({'from_date':'2025-08-01','to_date':'2025-09-19'}))
+2025-09-19 10:17:47,980 INFO ipython === session end ===
+2025-09-19 10:17:57,986 INFO ipython === bench console session ===
+2025-09-19 10:17:57,986 INFO ipython import helpdesk
+2025-09-19 10:17:57,987 INFO ipython import helpdesk.api.dashboard as dashboard
+2025-09-19 10:17:57,987 INFO ipython print(dashboard.get_agent_performance_chart({'from_date':'2025-08-01','to_date':'2025-09-19'}))
+2025-09-19 10:17:57,987 INFO ipython === session end ===
+2025-09-19 10:18:49,462 INFO ipython === bench console session ===
+2025-09-19 10:18:49,462 INFO ipython import helpdesk
+2025-09-19 10:18:49,462 INFO ipython from helpdesk.api import dashboard
+2025-09-19 10:18:49,462 INFO ipython filters={'from_date':'2025-08-20','to_date':'2025-09-19'}
+2025-09-19 10:18:49,462 INFO ipython print('performance overview', dashboard.get_performance_overview(filters))
+2025-09-19 10:18:49,462 INFO ipython print('agent chart', dashboard.get_agent_performance_chart(filters))
+2025-09-19 10:18:49,462 INFO ipython print('ticket velocity', dashboard.get_ticket_velocity_chart(filters))
+2025-09-19 10:18:49,462 INFO ipython print('team performance', dashboard.get_team_performance(filters))
+2025-09-19 10:18:49,462 INFO ipython === session end ===
+2025-09-19 10:30:51,778 INFO ipython === bench console session ===
+2025-09-19 10:30:51,779 INFO ipython import frappe
+2025-09-19 10:30:51,779 INFO ipython print([f.fieldname for f in frappe.get_meta('HD Ticket').fields if 'resolved' in f.fieldname.lower() or 'status' in f.fieldname.lower() or 'resolution' in f.fieldname.lower()])
+2025-09-19 10:30:51,779 INFO ipython === session end ===
+2025-09-19 10:31:06,048 INFO ipython === bench console session ===
+2025-09-19 10:31:06,048 INFO ipython import frappe
+2025-09-19 10:31:06,048 INFO ipython from frappe.utils import date_range
+2025-09-19 10:31:06,049 INFO ipython print(date_range('2025-09-01', '2025-09-03'))
+2025-09-19 10:31:06,049 INFO ipython === session end ===
+2025-09-19 10:44:39,683 INFO ipython === bench console session ===
+2025-09-19 10:44:39,683 INFO ipython import frappe
+2025-09-19 10:44:39,683 INFO ipython print([d.name for d in frappe.get_all('DocType') if d.name.startswith('HD')][:20])
+2025-09-19 10:44:39,683 INFO ipython === session end ===
+2025-09-19 10:45:08,881 INFO ipython === bench console session ===
+2025-09-19 10:45:08,881 INFO ipython import frappe
+2025-09-19 10:45:08,881 INFO ipython print([d.name for d in frappe.get_all('DocType', filters={'module':'Helpdesk'}) if 'Activity' in d.name])
+2025-09-19 10:45:08,882 INFO ipython === session end ===
+2025-09-19 10:45:16,768 INFO ipython === bench console session ===
+2025-09-19 10:45:16,769 INFO ipython import frappe
+2025-09-19 10:45:16,769 INFO ipython print(frappe.get_meta('HD Ticket Activity').fields)
+2025-09-19 10:45:16,769 INFO ipython === session end ===
+2025-09-19 10:45:31,712 INFO ipython === bench console session ===
+2025-09-19 10:45:31,712 INFO ipython import frappe
+2025-09-19 10:45:31,713 INFO ipython print(frappe.db.get_list('Communication', fields=['name','communication_medium','communication_type','subject'], limit=5))
+2025-09-19 10:45:31,713 INFO ipython === session end ===
+2025-09-19 10:45:51,032 INFO ipython === bench console session ===
+2025-09-19 10:45:51,032 INFO ipython import frappe
+2025-09-19 10:45:51,032 INFO ipython print([d.name for d in frappe.get_all('DocType', filters={'module':'Helpdesk'}) if 'SLA' in d.name])
+2025-09-19 10:45:51,032 INFO ipython === session end ===

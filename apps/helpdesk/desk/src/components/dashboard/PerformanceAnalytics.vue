@@ -7,7 +7,7 @@
           <div>
             <p class="text-sm font-medium text-gray-600">Avg Response Time</p>
             <p class="text-2xl font-bold text-gray-900">
-              {{ performanceData.data?.avg_response_time || '--' }}
+              {{ displayValue(performanceData.data?.avg_response_time) }}
               <span class="text-sm font-normal text-gray-500">hrs</span>
             </p>
           </div>
@@ -31,7 +31,7 @@
           <div>
             <p class="text-sm font-medium text-gray-600">Resolution Rate</p>
             <p class="text-2xl font-bold text-gray-900">
-              {{ performanceData.data?.resolution_rate || '--' }}
+              {{ displayValue(performanceData.data?.resolution_rate) }}
               <span class="text-sm font-normal text-gray-500">%</span>
             </p>
           </div>
@@ -55,7 +55,7 @@
           <div>
             <p class="text-sm font-medium text-gray-600">Customer Satisfaction</p>
             <p class="text-2xl font-bold text-gray-900">
-              {{ performanceData.data?.csat_score || '--' }}
+              {{ displayValue(performanceData.data?.csat_score) }}
               <span class="text-sm font-normal text-gray-500">/5</span>
             </p>
           </div>
@@ -87,7 +87,10 @@
             <div class="h-32 bg-gray-200 rounded w-full"></div>
           </div>
         </div>
-        <div v-else-if="!agentPerformance.data?.data?.length" class="h-80 flex items-center justify-center text-sm text-gray-500">
+        <div
+          v-else-if="!Array.isArray(agentPerformance.data?.data) || !agentPerformance.data?.data?.length"
+          class="h-80 flex items-center justify-center text-sm text-gray-500"
+        >
           No agent performance data for this period.
         </div>
         <div v-else class="h-80">
@@ -111,7 +114,10 @@
             <div class="h-32 bg-gray-200 rounded w-full"></div>
           </div>
         </div>
-        <div v-else-if="!ticketVelocity.data?.data?.length" class="h-80 flex items-center justify-center text-sm text-gray-500">
+        <div
+          v-else-if="!Array.isArray(ticketVelocity.data?.data) || !ticketVelocity.data?.data?.length"
+          class="h-80 flex items-center justify-center text-sm text-gray-500"
+        >
           No ticket velocity data for this period.
         </div>
         <div v-else class="h-80">
@@ -164,12 +170,12 @@
                   {{ agent.tickets_resolved || 0 }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {{ agent.avg_response_time || '--' }} hrs
+                  {{ displayValue(agent.avg_response_time) }} hrs
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="flex items-center">
                     <span class="text-sm text-gray-900 mr-2">
-                      {{ agent.csat_score || '--' }}
+                      {{ displayValue(agent.csat_score) }}
                     </span>
                     <div class="flex">
                       <LucideStar
@@ -186,9 +192,9 @@
                     class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
                     :class="getSLAComplianceClass(agent.sla_compliance)"
                   >
-                    {{ agent.sla_compliance || 0 }}%
-                  </span>
-                </td>
+                  {{ displayValue(agent.sla_compliance, 0) }}%
+                </span>
+              </td>
               </tr>
             </template>
             <tr v-else>
@@ -217,50 +223,88 @@ const props = defineProps<{
 
 const performanceData = createResource({
   url: "helpdesk.api.dashboard.get_performance_overview",
-  params: { filters: props.filters },
-  auto: true,
+  params: {},
+  auto: false,
 });
 
 const agentPerformance = createResource({
   url: "helpdesk.api.dashboard.get_agent_performance_chart",
-  params: { filters: props.filters },
-  auto: true,
+  params: {},
+  auto: false,
 });
 
 const ticketVelocity = createResource({
   url: "helpdesk.api.dashboard.get_ticket_velocity_chart",
-  params: { filters: props.filters },
-  auto: true,
+  params: {},
+  auto: false,
 });
 
 const teamPerformance = createResource({
   url: "helpdesk.api.dashboard.get_team_performance",
-  params: { filters: props.filters },
-  auto: isManager,
+  params: {},
+  auto: false,
 });
 
+const resolvedFilters = computed(() => {
+  const payload: Record<string, any> = {};
+  const source = props.filters || {};
+
+  if (source.period) {
+    const [from, to] = source.period.split(",");
+    if (from) payload.from_date = from;
+    if (to) payload.to_date = to;
+  }
+
+  if (source.agent) {
+    payload.agent = source.agent;
+  }
+
+  if (source.team) {
+    payload.team = source.team;
+  }
+
+  return payload;
+});
+
+const loadAnalytics = async (filters: Record<string, any>) => {
+  const params = { filters };
+
+  performanceData.update({ params });
+  agentPerformance.update({ params });
+  ticketVelocity.update({ params });
+
+  const requests: Promise<unknown>[] = [
+    performanceData.reload(),
+    agentPerformance.reload(),
+    ticketVelocity.reload(),
+  ];
+
+  if (isManager) {
+    teamPerformance.update({ params });
+    requests.push(teamPerformance.reload());
+  }
+
+  await Promise.allSettled(requests);
+};
+
 watch(
-  () => props.filters,
+  resolvedFilters,
   (filters) => {
-    const safeFilters = filters ? { ...filters } : {};
-    performanceData.update({ params: { filters: safeFilters } });
-    performanceData.reload();
-
-    agentPerformance.update({ params: { filters: safeFilters } });
-    agentPerformance.reload();
-
-    ticketVelocity.update({ params: { filters: safeFilters } });
-    ticketVelocity.reload();
-
-    if (isManager) {
-      teamPerformance.update({ params: { filters: safeFilters } });
-      teamPerformance.reload();
-    }
+    loadAnalytics(filters);
   },
-  { deep: true }
+  { immediate: true, deep: true }
 );
 
-const hasTeamData = computed(() => (teamPerformance.data || []).length > 0);
+const hasTeamData = computed(() =>
+  Array.isArray(teamPerformance.data) && teamPerformance.data.length > 0
+);
+
+const displayValue = (value: number | null | undefined, fallback = "--") => {
+  if (value === null || value === undefined || Number.isNaN(value)) {
+    return fallback;
+  }
+  return value;
+};
 
 const getChartType = (chart: any) => {
   const colors = [
