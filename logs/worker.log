@@ -1004,3 +1004,5 @@ Error 111 connecting to 127.0.0.1:11000. Connection refused.
 2025-09-19 11:08:10,466 Cleaning registries for queue: home-trieu-D-app-frappe-bench:short
 2025-09-19 11:08:10,467 Cleaning registries for queue: home-trieu-D-app-frappe-bench:default
 2025-09-19 11:08:10,467 Cleaning registries for queue: home-trieu-D-app-frappe-bench:long
+2025-09-19 11:09:30,706 Worker f23a81c9241b4bd2abf5045b7c17cfb8 [PID 220796]: warm shut down requested
+2025-09-19 11:09:30,707 Unsubscribing from channel rq:pubsub:f23a81c9241b4bd2abf5045b7c17cfb8
