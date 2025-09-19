@@ -112,3 +112,6 @@ werkzeug.exceptions.BadRequest: 400 Bad Request: Failed to decode JSON object: E
 2025-09-18 16:41:46,995 ERROR frappe New Exception collected in error log
 Site: helpdesk.test
 Form Dict: {'cmd': 'helpdesk.api.dashboard.get_dashboard_notifications'}
+2025-09-19 09:56:00,557 ERROR frappe New Exception collected in error log
+Site: helpdesk.test
+Form Dict: {'query': 'qưqe', 'cmd': 'helpdesk.api.article.search'}

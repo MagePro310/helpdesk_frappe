@@ -1,15 +1,25 @@
 <template>
-  <div class="bg-white border rounded-lg shadow-sm">
-    <div class="px-4 py-3 border-b border-gray-200">
-      <h3 class="text-sm font-medium text-gray-900">Quick Actions</h3>
+  <div class="bg-white/80 backdrop-blur-sm border rounded-xl shadow-sm">
+    <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+      <h3 class="text-sm font-semibold text-gray-900">Quick Actions</h3>
+      <span v-if="lastUpdated" class="text-[11px] text-gray-400">
+        Updated {{ lastUpdated }}
+      </span>
     </div>
 
     <div class="p-4">
-      <div class="grid grid-cols-2 gap-3">
+      <div v-if="isLoading" class="grid grid-cols-2 gap-3">
+        <div
+          v-for="placeholder in 6"
+          :key="placeholder"
+          class="h-[92px] rounded-lg bg-gray-100 animate-pulse"
+        ></div>
+      </div>
+      <div v-else class="grid grid-cols-2 gap-3">
         <!-- Create New Ticket -->
         <button
           @click="createNewTicket"
-          class="flex flex-col items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors group"
+          class="flex flex-col items-center justify-center p-3 border border-gray-200 rounded-lg bg-gradient-to-br from-white via-white to-gray-50 hover:shadow-md hover:-translate-y-[1px] transition-all group"
         >
           <LucidePlus class="size-6 text-blue-600 mb-2 group-hover:scale-110 transition-transform" />
           <span class="text-sm font-medium text-gray-900">New Ticket</span>
@@ -19,7 +29,7 @@
         <!-- Bulk Actions -->
         <button
           @click="openBulkActions"
-          class="flex flex-col items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors group"
+          class="flex flex-col items-center justify-center p-3 border border-gray-200 rounded-lg bg-gradient-to-br from-white via-white to-gray-50 hover:shadow-md hover:-translate-y-[1px] transition-all group"
         >
           <LucideList class="size-6 text-green-600 mb-2 group-hover:scale-110 transition-transform" />
           <span class="text-sm font-medium text-gray-900">Bulk Actions</span>
@@ -29,7 +39,7 @@
         <!-- My Tickets -->
         <button
           @click="viewMyTickets"
-          class="flex flex-col items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors group"
+          class="flex flex-col items-center justify-center p-3 border border-gray-200 rounded-lg bg-gradient-to-br from-white via-white to-gray-50 hover:shadow-md hover:-translate-y-[1px] transition-all group"
         >
           <LucideUser class="size-6 text-purple-600 mb-2 group-hover:scale-110 transition-transform" />
           <span class="text-sm font-medium text-gray-900">My Tickets</span>
@@ -40,7 +50,7 @@
         <button
           v-if="isManager"
           @click="viewTeamTickets"
-          class="flex flex-col items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors group"
+          class="flex flex-col items-center justify-center p-3 border border-gray-200 rounded-lg bg-gradient-to-br from-white via-white to-gray-50 hover:shadow-md hover:-translate-y-[1px] transition-all group"
         >
           <LucideUsers class="size-6 text-orange-600 mb-2 group-hover:scale-110 transition-transform" />
           <span class="text-sm font-medium text-gray-900">Team Tickets</span>
@@ -50,7 +60,7 @@
         <!-- Reports -->
         <button
           @click="viewReports"
-          class="flex flex-col items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors group"
+          class="flex flex-col items-center justify-center p-3 border border-gray-200 rounded-lg bg-gradient-to-br from-white via-white to-gray-50 hover:shadow-md hover:-translate-y-[1px] transition-all group"
         >
           <LucideBarChart class="size-6 text-indigo-600 mb-2 group-hover:scale-110 transition-transform" />
           <span class="text-sm font-medium text-gray-900">Reports</span>
@@ -61,7 +71,7 @@
         <button
           v-if="isManager"
           @click="openSettings"
-          class="flex flex-col items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors group"
+          class="flex flex-col items-center justify-center p-3 border border-gray-200 rounded-lg bg-gradient-to-br from-white via-white to-gray-50 hover:shadow-md hover:-translate-y-[1px] transition-all group"
         >
           <LucideSettings class="size-6 text-gray-600 mb-2 group-hover:scale-110 transition-transform" />
           <span class="text-sm font-medium text-gray-900">Settings</span>
@@ -74,7 +84,14 @@
         <h4 class="text-xs font-medium text-gray-700 uppercase tracking-wide mb-3">
           Quick Filters
         </h4>
-        <div class="flex flex-wrap gap-2">
+        <div v-if="isLoading" class="flex flex-wrap gap-2">
+          <div
+            v-for="placeholder in 4"
+            :key="`filter-${placeholder}`"
+            class="h-6 w-28 bg-gray-100 rounded-full animate-pulse"
+          ></div>
+        </div>
+        <div v-else class="flex flex-wrap gap-2">
           <button
             v-for="filter in quickFilters"
             :key="filter.name"
@@ -96,9 +113,10 @@
 
 <script setup lang="ts">
 import { createResource } from "frappe-ui";
-import { computed, onMounted } from "vue";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
+import { useTimeAgo } from "@vueuse/core";
 
 const router = useRouter();
 const { isManager, userId } = useAuthStore();
@@ -108,8 +126,14 @@ const ticketCounts = createResource({
   auto: true,
 });
 
+const isLoading = computed(() => ticketCounts.loading && !ticketCounts.data);
 const myTicketsCount = computed(() => ticketCounts.data?.my_tickets || 0);
 const teamTicketsCount = computed(() => ticketCounts.data?.team_tickets || 0);
+const lastRefresh = ref<string | null>(null);
+const lastUpdatedDisplay = useTimeAgo(lastRefresh);
+const lastUpdated = computed(() =>
+  lastRefresh.value ? lastUpdatedDisplay.value : null
+);
 
 const quickFilters = computed(() => [
   {
@@ -176,10 +200,21 @@ const applyQuickFilter = (filter: any) => {
   });
 };
 
+let refreshHandle: number | null = null;
+
 onMounted(() => {
-  // Refresh counts every 2 minutes
-  setInterval(() => {
-    ticketCounts.reload();
+  refreshHandle = window.setInterval(async () => {
+    await ticketCounts.reload();
   }, 120000);
 });
+
+onUnmounted(() => {
+  if (refreshHandle) {
+    clearInterval(refreshHandle);
+  }
+});
+
+ticketCounts.onSuccess = () => {
+  lastRefresh.value = new Date().toISOString();
+};
 </script>

@@ -1,8 +1,11 @@
 <template>
-  <div class="bg-white border rounded-lg shadow-sm">
-    <div class="px-4 py-3 border-b border-gray-200">
+  <div class="bg-white/80 border rounded-xl shadow-sm backdrop-blur-sm">
+    <div class="px-4 py-3 border-b border-gray-100">
       <div class="flex items-center justify-between">
-        <h3 class="text-sm font-medium text-gray-900">Recent Activity</h3>
+        <div>
+          <h3 class="text-sm font-semibold text-gray-900">Recent Activity</h3>
+          <p v-if="lastUpdated" class="text-xs text-gray-500">Updated {{ lastUpdated }}</p>
+        </div>
         <div class="flex items-center gap-2">
           <button
             @click="refreshActivities"
@@ -28,7 +31,7 @@
     </div>
 
     <div class="max-h-96 overflow-y-auto">
-      <div v-if="activities.loading && !activities.data?.length" class="p-4">
+      <div v-if="isInitialLoading" class="p-4">
         <div class="animate-pulse space-y-4">
           <div v-for="i in 5" :key="i" class="flex gap-3">
             <div class="size-8 bg-gray-200 rounded-full"></div>
@@ -40,7 +43,7 @@
         </div>
       </div>
 
-      <div v-else-if="!activities.data?.length" class="p-8 text-center">
+      <div v-else-if="isEmptyState" class="p-8 text-center">
         <LucideActivity class="size-8 text-gray-300 mx-auto mb-2" />
         <p class="text-sm text-gray-500">No recent activities</p>
       </div>
@@ -127,10 +130,11 @@
     <div v-if="hasMore" class="px-4 py-3 border-t border-gray-200">
       <button
         @click="loadMore"
-        class="text-sm text-blue-600 hover:text-blue-800 font-medium w-full text-center"
-        :disabled="activities.loading"
+        class="text-sm text-blue-600 hover:text-blue-800 font-medium w-full text-center flex items-center justify-center gap-2"
+        :disabled="activities.loading || isLoadingMore"
       >
-        Load more activities
+        <span v-if="isLoadingMore" class="size-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></span>
+        <span>Load more activities</span>
       </button>
     </div>
   </div>
@@ -141,12 +145,21 @@ import { createResource, Dropdown } from "frappe-ui";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import UserAvatar from "@/components/UserAvatar.vue";
+import { useTimeAgo } from "@vueuse/core";
 
 const router = useRouter();
 
 const selectedFilter = ref("All");
 const hasMore = ref(true);
 const currentPage = ref(1);
+const pageSize = 20;
+const activityList = ref<any[]>([]);
+const isLoadingMore = ref(false);
+const lastRefresh = ref<string | null>(null);
+const lastUpdatedDisplay = useTimeAgo(lastRefresh);
+const lastUpdated = computed(() =>
+  lastRefresh.value ? lastUpdatedDisplay.value : null
+);
 
 const filterOptions = [
   { label: "All", value: "All" },
@@ -161,39 +174,72 @@ const activities = createResource({
   url: "helpdesk.api.dashboard.get_recent_activities",
   params: {
     page: currentPage.value,
-    filter_type: selectedFilter.value
+    filter_type: selectedFilter.value,
+    page_size: pageSize,
   },
   auto: true,
+  onSuccess: (data: any[]) => {
+    if (currentPage.value === 1) {
+      activityList.value = Array.isArray(data) ? data : [];
+    } else if (Array.isArray(data) && data.length) {
+      activityList.value = [...activityList.value, ...data];
+    }
+
+    hasMore.value = Array.isArray(data) ? data.length >= pageSize : false;
+    isLoadingMore.value = false;
+    lastRefresh.value = new Date().toISOString();
+  },
+  onError: () => {
+    if (currentPage.value > 1) {
+      currentPage.value -= 1;
+    }
+    isLoadingMore.value = false;
+  },
 });
 
 const filteredActivities = computed(() => {
-  if (!activities.data) return [];
-  if (selectedFilter.value === "All") return activities.data;
-  return activities.data.filter((activity: any) => activity.type === selectedFilter.value);
+  if (selectedFilter.value === "All") {
+    return activityList.value;
+  }
+  return activityList.value.filter(
+    (activity: any) => activity.type === selectedFilter.value
+  );
 });
 
-const refreshActivities = () => {
-  currentPage.value = 1;
-  hasMore.value = true;
+const isInitialLoading = computed(
+  () => activities.loading && currentPage.value === 1 && activityList.value.length === 0
+);
+
+const isEmptyState = computed(
+  () => !activities.loading && activityList.value.length === 0
+);
+
+const updateParams = () => {
   activities.update({
     params: {
       page: currentPage.value,
-      filter_type: selectedFilter.value
-    }
+      filter_type: selectedFilter.value,
+      page_size: pageSize,
+    },
   });
-  activities.reload();
 };
 
-const loadMore = () => {
+const refreshActivities = async () => {
+  currentPage.value = 1;
+  hasMore.value = true;
+  activityList.value = [];
+  updateParams();
+  await activities.reload();
+};
+
+const loadMore = async () => {
+  if (!hasMore.value || isLoadingMore.value) {
+    return;
+  }
+  isLoadingMore.value = true;
   currentPage.value += 1;
-  // In a real implementation, you would append new data
-  activities.update({
-    params: {
-      page: currentPage.value,
-      filter_type: selectedFilter.value
-    }
-  });
-  activities.reload();
+  updateParams();
+  await activities.reload();
 };
 
 const navigateToTicket = (ticketId: string) => {
@@ -264,12 +310,11 @@ watch(selectedFilter, () => {
   refreshActivities();
 });
 
-// Auto-refresh activities every 60 seconds
-let refreshInterval: number;
+let refreshInterval: number | null = null;
 
 onMounted(() => {
-  refreshInterval = setInterval(() => {
-    if (currentPage.value === 1) {
+  refreshInterval = window.setInterval(() => {
+    if (currentPage.value === 1 && !activities.loading) {
       refreshActivities();
     }
   }, 60000);

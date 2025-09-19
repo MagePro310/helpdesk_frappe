@@ -1,8 +1,13 @@
 <template>
-  <div class="bg-white border rounded-lg shadow-sm">
-    <div class="px-4 py-3 border-b border-gray-200">
+  <div class="bg-white/80 backdrop-blur-sm border rounded-xl shadow-sm">
+    <div class="px-4 py-3 border-b border-gray-100">
       <div class="flex items-center justify-between">
-        <h3 class="text-sm font-medium text-gray-900">Real-time Notifications</h3>
+        <div>
+          <h3 class="text-sm font-semibold text-gray-900">Real-time Notifications</h3>
+          <p class="text-xs text-gray-500" v-if="lastUpdated">
+            Updated {{ lastUpdated }}
+          </p>
+        </div>
         <div class="flex items-center gap-2">
           <button
             @click="refreshNotifications"
@@ -58,11 +63,18 @@
             </div>
             <div class="flex-1 min-w-0">
               <div class="flex items-center justify-between">
-                <p class="text-sm font-medium text-gray-900 truncate">
+                <p class="text-sm font-semibold text-gray-900 truncate">
                   {{ notification.title }}
                 </p>
                 <span class="text-xs text-gray-500">
                   {{ formatTime(notification.creation) }}
+                </span>
+              </div>
+              <div class="mt-1">
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium uppercase tracking-wide"
+                  :class="getNotificationBadge(notification.type)"
+                >
+                  {{ getNotificationLabel(notification.type) }}
                 </span>
               </div>
               <p class="text-sm text-gray-600 mt-1">
@@ -86,7 +98,7 @@
       <button
         @click="markAllAsRead"
         class="text-sm text-blue-600 hover:text-blue-800 font-medium w-full text-center"
-        :disabled="unreadCount === 0"
+        :disabled="unreadCount === 0 || notifications.loading || markingAll"
       >
         Mark all as read
       </button>
@@ -95,9 +107,10 @@
 </template>
 
 <script setup lang="ts">
-import { createResource, call } from "frappe-ui";
+import { createResource, call, toast } from "frappe-ui";
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import { useRouter } from "vue-router";
+import { useTimeAgo } from "@vueuse/core";
 
 const router = useRouter();
 
@@ -105,11 +118,27 @@ const notifications = createResource({
   url: "helpdesk.api.dashboard.get_dashboard_notifications",
   cache: ["Dashboard", "Notifications"],
   auto: true,
+  onSuccess: (data: any[]) => {
+    if (!Array.isArray(data)) return;
+    data.forEach((item) => {
+      if (typeof item.read === "undefined") {
+        item.read = false;
+      }
+    });
+    lastRefresh.value = new Date().toISOString();
+  },
 });
 
 const unreadCount = computed(() => {
   return notifications.data?.filter((n: any) => !n.read)?.length || 0;
 });
+
+const markingAll = ref(false);
+const lastRefresh = ref<string | null>(null);
+const lastUpdatedDisplay = useTimeAgo(lastRefresh);
+const lastUpdated = computed(() =>
+  lastRefresh.value ? lastUpdatedDisplay.value : null
+);
 
 const refreshNotifications = () => {
   notifications.reload();
@@ -117,19 +146,34 @@ const refreshNotifications = () => {
 
 const markAsRead = async (notification: any) => {
   if (!notification.read) {
-    await call({
-      method: "helpdesk.api.dashboard.mark_notification_read",
-      args: { notification_id: notification.name },
-    });
-    notification.read = true;
+    try {
+      await call({
+        method: "helpdesk.api.dashboard.mark_notification_read",
+        args: { notification_id: notification.name },
+      });
+      notification.read = true;
+    } catch (error) {
+      toast.error("Could not update notification");
+    }
   }
 };
 
 const markAllAsRead = async () => {
-  await call({
-    method: "helpdesk.api.dashboard.mark_all_notifications_read",
-  });
-  notifications.reload();
+  if (unreadCount.value === 0) {
+    return;
+  }
+  markingAll.value = true;
+  try {
+    await call({
+      method: "helpdesk.api.dashboard.mark_all_notifications_read",
+    });
+    await notifications.reload();
+    toast.success("All notifications cleared");
+  } catch (error) {
+    toast.error("Unable to mark notifications as read");
+  } finally {
+    markingAll.value = false;
+  }
 };
 
 const navigateToTicket = (url: string) => {
@@ -148,6 +192,29 @@ const getNotificationColor = (type: string) => {
     'default': 'bg-gray-500'
   };
   return colors[type] || colors.default;
+};
+
+const getNotificationBadge = (type: string) => {
+  const styles = {
+    'ticket_assigned': 'bg-blue-100 text-blue-700 border border-blue-200',
+    'ticket_updated': 'bg-emerald-100 text-emerald-700 border border-emerald-200',
+    'sla_breach': 'bg-red-100 text-red-700 border border-red-200',
+    'feedback_received': 'bg-amber-100 text-amber-700 border border-amber-200',
+    'ticket_resolved': 'bg-green-100 text-green-700 border border-green-200',
+    'default': 'bg-gray-100 text-gray-700 border border-gray-200'
+  };
+  return styles[type] || styles.default;
+};
+
+const getNotificationLabel = (type: string) => {
+  const labels: Record<string, string> = {
+    ticket_assigned: 'Assignment',
+    ticket_updated: 'Update',
+    sla_breach: 'SLA',
+    feedback_received: 'Feedback',
+    ticket_resolved: 'Resolved',
+  };
+  return labels[type] || 'Alert';
 };
 
 const formatTime = (timestamp: string) => {

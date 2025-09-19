@@ -76,49 +76,55 @@
     </div>
 
     <!-- Agent Performance Chart -->
-    <div class="bg-white border rounded-lg shadow-sm">
+    <div class="bg-white/80 border rounded-xl shadow-sm backdrop-blur-sm">
       <div class="px-4 py-3 border-b border-gray-200">
         <h3 class="text-sm font-medium text-gray-900">Agent Performance</h3>
       </div>
       <div class="p-4">
-        <div v-if="!agentPerformance.loading && agentPerformance.data" class="h-80">
+        <div v-if="agentPerformance.loading" class="h-80 flex items-center justify-center">
+          <div class="animate-pulse">
+            <div class="h-4 bg-gray-200 rounded w-48 mb-4"></div>
+            <div class="h-32 bg-gray-200 rounded w-full"></div>
+          </div>
+        </div>
+        <div v-else-if="!agentPerformance.data?.data?.length" class="h-80 flex items-center justify-center text-sm text-gray-500">
+          No agent performance data for this period.
+        </div>
+        <div v-else class="h-80">
           <component
             :is="getChartType(agentPerformance.data)"
             :config="agentPerformance.data"
           />
         </div>
-        <div v-else class="h-80 flex items-center justify-center">
+      </div>
+    </div>
+
+    <!-- Ticket Velocity Chart -->
+    <div class="bg-white/80 border rounded-xl shadow-sm backdrop-blur-sm">
+      <div class="px-4 py-3 border-b border-gray-200">
+        <h3 class="text-sm font-medium text-gray-900">Ticket Velocity</h3>
+      </div>
+      <div class="p-4">
+        <div v-if="ticketVelocity.loading" class="h-80 flex items-center justify-center">
           <div class="animate-pulse">
             <div class="h-4 bg-gray-200 rounded w-48 mb-4"></div>
             <div class="h-32 bg-gray-200 rounded w-full"></div>
           </div>
         </div>
-      </div>
-    </div>
-
-    <!-- Ticket Velocity Chart -->
-    <div class="bg-white border rounded-lg shadow-sm">
-      <div class="px-4 py-3 border-b border-gray-200">
-        <h3 class="text-sm font-medium text-gray-900">Ticket Velocity</h3>
-      </div>
-      <div class="p-4">
-        <div v-if="!ticketVelocity.loading && ticketVelocity.data" class="h-80">
+        <div v-else-if="!ticketVelocity.data?.data?.length" class="h-80 flex items-center justify-center text-sm text-gray-500">
+          No ticket velocity data for this period.
+        </div>
+        <div v-else class="h-80">
           <component
             :is="getChartType(ticketVelocity.data)"
             :config="ticketVelocity.data"
           />
         </div>
-        <div v-else class="h-80 flex items-center justify-center">
-          <div class="animate-pulse">
-            <div class="h-4 bg-gray-200 rounded w-48 mb-4"></div>
-            <div class="h-32 bg-gray-200 rounded w-full"></div>
-          </div>
-        </div>
       </div>
     </div>
 
     <!-- Team Performance Table -->
-    <div v-if="isManager" class="bg-white border rounded-lg shadow-sm">
+    <div v-if="isManager" class="bg-white/80 border rounded-xl shadow-sm backdrop-blur-sm">
       <div class="px-4 py-3 border-b border-gray-200">
         <h3 class="text-sm font-medium text-gray-900">Team Performance</h3>
       </div>
@@ -144,43 +150,50 @@
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
-            <tr v-for="agent in teamPerformance.data" :key="agent.agent">
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="flex items-center">
-                  <UserAvatar :name="agent.agent" class="size-8 mr-3" />
-                  <div class="text-sm font-medium text-gray-900">
-                    {{ agent.full_name || agent.agent }}
+            <template v-if="hasTeamData">
+              <tr v-for="agent in teamPerformance.data" :key="agent.agent">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <UserAvatar :name="agent.agent" class="size-8 mr-3" />
+                    <div class="text-sm font-medium text-gray-900">
+                      {{ agent.full_name || agent.agent }}
+                    </div>
                   </div>
-                </div>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                {{ agent.tickets_resolved || 0 }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                {{ agent.avg_response_time || '--' }} hrs
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="flex items-center">
-                  <span class="text-sm text-gray-900 mr-2">
-                    {{ agent.csat_score || '--' }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {{ agent.tickets_resolved || 0 }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {{ agent.avg_response_time || '--' }} hrs
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <span class="text-sm text-gray-900 mr-2">
+                      {{ agent.csat_score || '--' }}
+                    </span>
+                    <div class="flex">
+                      <LucideStar
+                        v-for="i in 5"
+                        :key="i"
+                        class="size-4"
+                        :class="i <= (agent.csat_score || 0) ? 'text-yellow-400 fill-current' : 'text-gray-300'"
+                      />
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                    :class="getSLAComplianceClass(agent.sla_compliance)"
+                  >
+                    {{ agent.sla_compliance || 0 }}%
                   </span>
-                  <div class="flex">
-                    <LucideStar
-                      v-for="i in 5"
-                      :key="i"
-                      class="size-4"
-                      :class="i <= (agent.csat_score || 0) ? 'text-yellow-400 fill-current' : 'text-gray-300'"
-                    />
-                  </div>
-                </div>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span
-                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                  :class="getSLAComplianceClass(agent.sla_compliance)"
-                >
-                  {{ agent.sla_compliance || 0 }}%
-                </span>
+                </td>
+              </tr>
+            </template>
+            <tr v-else>
+              <td class="px-6 py-8 text-center text-sm text-gray-500" colspan="5">
+                No team performance data for the selected filters.
               </td>
             </tr>
           </tbody>
@@ -192,7 +205,7 @@
 
 <script setup lang="ts">
 import { createResource, AxisChart, DonutChart } from "frappe-ui";
-import { computed, h } from "vue";
+import { computed, h, watch } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import UserAvatar from "@/components/UserAvatar.vue";
 
@@ -225,6 +238,29 @@ const teamPerformance = createResource({
   params: { filters: props.filters },
   auto: isManager,
 });
+
+watch(
+  () => props.filters,
+  (filters) => {
+    const safeFilters = filters ? { ...filters } : {};
+    performanceData.update({ params: { filters: safeFilters } });
+    performanceData.reload();
+
+    agentPerformance.update({ params: { filters: safeFilters } });
+    agentPerformance.reload();
+
+    ticketVelocity.update({ params: { filters: safeFilters } });
+    ticketVelocity.reload();
+
+    if (isManager) {
+      teamPerformance.update({ params: { filters: safeFilters } });
+      teamPerformance.reload();
+    }
+  },
+  { deep: true }
+);
+
+const hasTeamData = computed(() => (teamPerformance.data || []).length > 0);
 
 const getChartType = (chart: any) => {
   const colors = [

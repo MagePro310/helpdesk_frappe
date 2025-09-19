@@ -102,3 +102,9 @@
 2025-09-18 16:39:11,631 INFO /home/trieu/anaconda3/envs/py312/bin/bench build
 2025-09-18 16:39:46,115 INFO /home/trieu/anaconda3/envs/py312/bin/bench build
 2025-09-18 16:42:19,730 INFO /home/trieu/anaconda3/envs/py312/bin/bench build
+2025-09-19 09:41:12,712 INFO /home/trieu/anaconda3/bin/bench build
+2025-09-19 09:42:41,026 INFO /home/trieu/anaconda3/bin/bench start
+2025-09-19 09:42:41,250 INFO /home/trieu/anaconda3/bin/bench serve --port 8000
+2025-09-19 09:42:41,252 INFO /home/trieu/anaconda3/bin/bench schedule
+2025-09-19 09:42:41,254 INFO /home/trieu/anaconda3/bin/bench watch
+2025-09-19 09:42:41,256 INFO /home/trieu/anaconda3/bin/bench worker

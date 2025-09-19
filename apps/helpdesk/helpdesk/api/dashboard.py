@@ -795,6 +795,39 @@ def get_quick_action_counts():
 
 @frappe.whitelist()
 @agent_only
+def schedule_dashboard_report(schedule):
+    """Persist dashboard scheduling preferences for the current user."""
+    if not schedule:
+        frappe.throw(_("Schedule details are required."))
+
+    parsed = frappe.parse_json(schedule)
+    parsed["updated_at"] = frappe.utils.now()
+
+    key = f"helpdesk_dashboard_schedule::{frappe.session.user}"
+    frappe.db.set_default(key, frappe.as_json(parsed))
+
+    return {"status": "success"}
+
+
+@frappe.whitelist()
+@agent_only
+def get_dashboard_schedule():
+    """Fetch persisted dashboard scheduling preferences."""
+    key = f"helpdesk_dashboard_schedule::{frappe.session.user}"
+    stored = frappe.db.get_default(key)
+
+    schedule = None
+    if stored:
+        try:
+            schedule = frappe.parse_json(stored)
+        except Exception:
+            schedule = None
+
+    return {"schedule": schedule}
+
+
+@frappe.whitelist()
+@agent_only
 def get_performance_overview(filters=None):
     """
     Get performance overview metrics
